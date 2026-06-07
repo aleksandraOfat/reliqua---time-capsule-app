@@ -9,78 +9,6 @@ import { createClient} from '@/lib/supabase/server'
 export type CapsuleFormState = { error?: string }
 export type WizardState = { error?: string }
 
-export async function createCapsule(
-    _prevState: CapsuleFormState,
-    formData: FormData
-): Promise<CapsuleFormState> {
-    const title = (formData.get('title') as string)?.trim()
-    const message = (formData.get('message') as string)?.trim()
-    const openDate = formData.get('open_date') as string
-    const capsulePassword = (formData.get('capsule_password') as string)?.trim()
-
-    if (!title) {
-        return { error: 'Please enter a title.' }
-    }
-    if (!openDate) {
-        return { error: 'Please choose an open date.' }
-    }
-
-    if (new Date(openDate) <= new Date()) {
-        return { error: 'The open date must be in the future.' }
-    }
-
-    const supabase = await createClient()
-    const {
-        data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user) {
-        return { error: 'You must be signed in to create a capsule.' }
-    }
-    let passwordHash: string | null = null
-    if (capsulePassword) {
-        passwordHash = await bcrypt.hash(capsulePassword, 10)
-    }
-
-
-    const { data: capsule, error: capsuleError } = await supabase
-        .from('capsules')
-        .insert({
-            owner_id: user.id,
-            title,
-            status: 'sealed',
-            sealed_at: new Date().toISOString(),
-            capsule_password_hash: passwordHash,
-        })
-        .select('id')
-        .single()
-
-    if (capsuleError || !capsule) {
-        return { error: 'Could not create the capsule. Please try again.' }
-    }
-
-    if (message) {
-        const { error: contentError } = await supabase
-            .from('capsule_contents')
-            .insert({ capsule_id: capsule.id, encrypted_message: encrypt(message) })
-
-        if (contentError) {
-            return { error: 'The capsule was created, but the message could not be saved.' }
-        }
-    }
-
-
-    const { error: conditionError } = await supabase
-        .from('open_conditions')
-        .insert({ capsule_id: capsule.id, open_date: openDate })
-
-    if (conditionError) {
-        return { error: 'The capsule was created, but the open date could not be saved.' }
-    }
-
-    revalidatePath('/dashboard')
-    redirect('/dashboard')
-}
 
 export async function openCapsule(formData: FormData) {
     const id = formData.get('capsule_id') as string
@@ -213,6 +141,11 @@ export async function createCapsuleFull(
     const files = formData.getAll('files') as File[]
     const capsulePassword = (formData.get('capsule_password') as string)?.trim()
     const sealDeadline = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString()
+    const visibility = (formData.get('visibility') as string) || 'private'
+    const memLat = parseFloat(formData.get('memory_lat')as string)
+    const memLng = parseFloat(formData.get('memory_lng') as string)
+    const isPublic = visibility === 'public'
+    const memCover = formData.get('memory_cover') as File | null
 
 
     if (!title) return {error: 'Please enter a capsule name.' }
@@ -239,7 +172,7 @@ export async function createCapsuleFull(
             title,
             description: description || null,
             status: 'collecting',
-            is_public: false,
+            is_public: isPublic,
             sealed_at: null, //new Date().toISOString(),
             seal_deadline: sealDeadline,
             capsule_password_hash: passwordHash,
@@ -295,6 +228,35 @@ export async function createCapsuleFull(
         p_entity_id: capsule.id,
     })
 
+    if (isPublic && !Number.isNaN(memLat) && !Number.isNaN(memLng)) {
+        let memCoverUrl: string | null = null
+        if (memCover && memCover.size > 0) {
+            const ext = memCover.name.split('.').pop() || 'jpg'
+            const coverPath = `${user.id}/${crypto.randomUUID()}.${ext}`
+            const bytes = Buffer.from(await memCover.arrayBuffer())
+            const { error: coverErr } = await supabase.storage
+                .from('memory-covers')
+                .upload(coverPath, bytes, { contentType: memCover.type })
+            if (!coverErr) {
+                const { data: pub } = supabase.storage.from('memory-covers').getPublicUrl(coverPath)
+                memCoverUrl = pub.publicUrl
+            }
+        }
+
+        await supabase.from('public_memories').upsert(
+            {
+                capsule_id: capsule.id,
+                owner_id: user.id,
+                title,
+                note: null,
+                lat: memLat,
+                lng: memLng,
+                cover_url: memCoverUrl,
+                memory_date: new Date().toISOString().slice(0, 10),
+            },
+            { onConflict: 'capsule_id' }
+        )
+    }
 
     try {
         const invites: string[] = JSON.parse(invitesRaw)
@@ -698,14 +660,12 @@ export async function shareMemory(formData: FormData) {
             .from('memory-covers')
             .upload(path, bytes, { contentType: cover.type })
         if (upErr) {
-            console.error('cover upload error:', upErr)
         } else {
             const { data: pub } = supabase.storage.from('memory-covers').getPublicUrl(path)
             coverUrl = pub.publicUrl
             console.log('cover url:', coverUrl)
         }
     } else {
-        console.log('brak pliku okładki w formularzu')
     }
 
     if (!coverUrl) {
@@ -748,4 +708,28 @@ export async function shareMemory(formData: FormData) {
     revalidatePath('/memories')
     revalidatePath('/dashboard')
     redirect('/dashboard?shared=1')
+}
+
+export async function deleteMemory(formData: FormData) {
+    const memoryId = formData.get('memory_id') as string
+    const capsuleId = (formData.get('capsule_id') as string) || ''
+    const returnTo= (formData.get('return_to') as string)|| '/memories'
+
+    const supabase = await createClient()
+    const { data: { user }} =  await supabase.auth.getUser()
+    if (!user) redirect('/login')
+
+    await supabase.from('public_memories').delete().eq('id', memoryId)
+
+    if (capsuleId){
+        await supabase
+            .from('capsules')
+            .update({ is_public: false })
+            .eq('id', capsuleId)
+            .eq('owner_id', user.id)
+    }
+
+    revalidatePath('/memories')
+    if (capsuleId) revalidatePath(`/capsules/${capsuleId}`)
+    redirect(returnTo)
 }

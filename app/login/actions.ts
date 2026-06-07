@@ -35,12 +35,11 @@ export async function authenticate(
         }
     }
 
-    // Domyślna akcja: logowanie
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
         return { error: 'Nieprawidłowy e-mail lub hasło.' }
     }
 
     revalidatePath('/', 'layout')
-    redirect('/')
+    redirect('/dashboard')
 }

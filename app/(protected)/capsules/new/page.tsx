@@ -2,6 +2,7 @@
 
 import {useActionState, useState,startTransition } from 'react'
 import {createCapsuleFull, checkUserExists, type WizardState } from '../actions'
+import LocationPicker from './location-picker'
 
 const initialState: WizardState = {}
 
@@ -10,8 +11,6 @@ const STEPS = ['General Information', 'Add contents', 'Summary']
 export default function NewCapsuleWizard() {
     const [state, formAction, isPending] = useActionState(createCapsuleFull, initialState)
     const [step, setStep] = useState(0)
-
-    // Stan formularza zachowywany między krokami
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
     const [localDate, setLocalDate] = useState('')
@@ -23,6 +22,11 @@ export default function NewCapsuleWizard() {
     const [capsulePassword, setCapsulePassword] = useState('')
     const [inviteError, setInviteError] = useState('')
     const [checking, setChecking] = useState(false)
+    const [visibility, setVisibility] = useState<'private' | 'public'>('private')
+    const [memLat, setMemLat]= useState('')
+    const [memLng, setMemLng] = useState('')
+    const [memCover, setMemCover] = useState<File | null>(null)
+    const [stepError, setStepError] = useState('')
 
     const isoDate = localDate ? new Date(localDate).toISOString() : ''
 
@@ -59,15 +63,36 @@ export default function NewCapsuleWizard() {
         fd.set('message', message)
         fd.set('invites', JSON.stringify(invites))
         fd.set('capsule_password', capsulePassword)
+        fd.set('visibility', visibility)
+        fd.set('memory_lat', memLat)
+        fd.set('memory_lng', memLng)
+        if (memCover) fd.set('memory_cover', memCover)
         files.forEach((f) => fd.append('files', f))
         startTransition(() => {
             formAction(fd)
         })
     }
 
+    function goNext() {
+        if (step === 0) {
+            const problems: string[] = []
+            if (!title.trim()) problems.push('enter a capsule name')
+            if (!localDate) problems.push('choose an opening date')
+            else if (new Date(localDate) <= new Date()) problems.push('set the opening date in the future')
+            if (visibility === 'public' && (!memLat || !memLng)) {
+                problems.push('pick a location on the map for the public memory')
+            }
+            if (problems.length > 0) {
+                setStepError('Please ' + problems.join(', and ') + '.')
+                return
+            }
+        }
+        setStepError('')
+        setStep((s) => s + 1)
+    }
+
     return (
         <div className="mx-auto max-w-2xl">
-            {/* Pasek kroków */}
             <ol className="mb-8 flex items-center gap-2 text-sm">
                 {STEPS.map((label, i) => (
                     <li key={label} className="flex flex-1 items-center gap-2">
@@ -134,16 +159,61 @@ export default function NewCapsuleWizard() {
                                 className={inputCls}
                             />
                         </Field>
-                        <Field label="Visibility (coming soon)">
-                            <div className="grid grid-cols-3 gap-3 opacity-60">
-                                {['Private', 'Public', 'Group'].map((v) => (
-                                    <div key={v}
-                                         className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-600">
-                                        {v}
-                                    </div>
+                        <Field label="Visibility">
+                            <div className="grid grid-cols-2 gap-3">
+                                {(['private', 'public'] as const).map((v) => (
+                                    <button
+                                        type="button"
+                                        key={v}
+                                        onClick={() => setVisibility(v)}
+                                        className={`rounded-lg border px-3 py-2 text-sm ${
+                                            visibility === v
+                                                ? 'border-emerald-600 bg-emerald-50 text-emerald-800'
+                                                : 'border-slate-300 text-slate-600'
+                                        }`}
+                                    >
+                                        {v === 'private'
+                                            ? 'Private — only you and invited people'
+                                            : 'Public — show on the map after opening'}
+                                    </button>
                                 ))}
                             </div>
                         </Field>
+
+                        {visibility === 'public' &&(
+                            <div className="flex flex-col gap-1">
+                                <span className="text-sm font-medium text-slate-700">
+                                    Pick the memory location
+                                </span>
+                                <LocationPicker
+                                    onPick={(la, ln)=> {
+                                        setMemLat(la.toFixed(6))
+                                        setMemLng(ln.toFixed(6))
+                                    }}
+                                />
+                                {memLat && memLng ? (
+                                    <span className="text-xs text-slate-500">
+                                        Selected: {memLat}, {memLng}
+                                    </span>
+                                ) : (
+                                    <span className="text-xs text-amber-700">
+                                        Click on the map to choose where this memory will appear.
+                                    </span>
+                                )}
+                                <label className="mt-3 text-sm font-medium text-slate-700">
+                                    Cover photo (optional, public)
+                                </label>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => setMemCover(e.target.files?.[0] ?? null)}
+                                    className="block w-full text-sm text-slate-600"
+                                />
+                                {memCover && (
+                                    <span className="text-xs text-slate-500">{memCover.name}</span>
+                                )}
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -226,7 +296,7 @@ export default function NewCapsuleWizard() {
                                 label="What's Inside"
                                 value={`${files.length} file(s) · ${message ? '1 message' : 'no message'}`}
                             />
-                            <SummaryRow label="Visibility" value="Private"/>
+                            <SummaryRow label="Visibility" value={visibility === 'public' ? 'Public' : 'Private'} />
                         </div>
 
                         <div>
@@ -287,11 +357,16 @@ export default function NewCapsuleWizard() {
                 )}
 
                 {/* Nawigacja */}
+                {stepError && (
+                    <p className="mt-6 rounded-lg bg-red-50 px-3 py-2 text-center text-sm text-red-700">
+                        {stepError}
+                    </p>
+                )}
                 <div className="mt-8 flex justify-center gap-3">
                     {step > 0 && (
                         <button
                             type="button"
-                            onClick={() => setStep((s) => s - 1)}
+                            onClick={() =>{ setStepError('');setStep((s) => s - 1)}}
                             className="rounded-lg bg-amber-600 px-6 py-2.5 font-medium text-white hover:bg-amber-700"
                         >
                             ← Back
@@ -300,9 +375,8 @@ export default function NewCapsuleWizard() {
                     {step < 2 ? (
                         <button
                             type="button"
-                            disabled={step === 0 && !canNextFrom0}
-                            onClick={() => setStep((s) => s + 1)}
-                            className="rounded-lg bg-emerald-900 px-10 py-2.5 font-medium text-white hover:bg-emerald-950 disabled:opacity-40"
+                            onClick={goNext}
+                            className="rounded-lg bg-emerald-900 px-10 py-2.5 font-medium text-white hover:bg-emerald-950"
                         >
                             Next →
                         </button>

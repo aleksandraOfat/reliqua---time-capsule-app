@@ -3,7 +3,7 @@ import Link from 'next/link'
 import {createClient } from '@/lib/supabase/server'
 //import { openCapsule } from '../actions'
 import {decrypt} from '@/lib/crypto'
-import {openCapsule, inviteMember, removeMember, addContribution,addContributionFile, sealNow, finishContribution, deleteContribution, deleteContributionFile,deleteCapsule} from '../actions'
+import {openCapsule, inviteMember, removeMember, addContribution,addContributionFile, sealNow, finishContribution, deleteContribution, deleteContributionFile,deleteCapsule,deleteMemory} from '../actions'
 import ConfirmButton from '@/components/confirm-button'
 
 
@@ -148,6 +148,16 @@ export default async function CapsulePage({
         files = fileRows ?? []
     }
 
+    let myMemoryId: string | null = null
+    if (isOwner){
+        const { data: mem } = await supabase
+            .from('public_memories')
+            .select('id')
+            .eq('capsule_id', id)
+            .maybeSingle()
+        myMemoryId = mem?.id ?? null
+    }
+
 
     return (
         <div className="mx-auto max-w-lg">
@@ -218,13 +228,27 @@ export default async function CapsulePage({
                 </div>
             )}
 
-            {isOpened &&isOwner && (
-                <Link
-                    href={`/capsules/${id}/share`}
-                    className="mt-4 inline-block rounded-lg border border-emerald-300 px-3 py-1.5 text-sm font-medium text-emerald-700 transition hover:bg-emerald-50"
-                >
-                    Share as public memory
-                </Link>
+            {isOpened && isOwner && (
+                myMemoryId ? (
+                    <form action={deleteMemory} className="mt-4">
+                        <input type="hidden" name="memory_id" value={myMemoryId} />
+                        <input type="hidden" name="capsule_id" value={id} />
+                        <input type="hidden" name="return_to" value={`/capsules/${id}`} />
+                        <ConfirmButton
+                            message="Remove this capsule's memory from the public map?"
+                            className="inline-block rounded-lg border border-red-300 px-3 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
+                        >
+                            Remove from public map
+                        </ConfirmButton>
+                    </form>
+                ) : (
+                    <Link
+                        href={`/capsules/${id}/share`}
+                        className="mt-4 inline-block rounded-lg border border-emerald-300 px-3 py-1.5 text-sm font-medium text-emerald-700 transition hover:bg-emerald-50"
+                    >
+                        Share as public memory
+                    </Link>
+                )
             )}
 
             {isCollecting && (

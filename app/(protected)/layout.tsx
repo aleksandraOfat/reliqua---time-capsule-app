@@ -22,11 +22,31 @@ export default async function ProtectedLayout({
         .select('id', { count: 'exact', head: true})
         .eq('is_read', false)
 
+    const { data: adminProfile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .maybeSingle()
+    const isAdmin = adminProfile?.role === 'admin'
+    const {data: activeCheck} = await supabase
+        .from('profiles')
+        .select('is_active')
+        .eq('id', user.id)
+        .maybeSingle()
+    if (activeCheck && activeCheck.is_active === false) {
+        redirect('/deactivated')
+    }
+
     return (
         <div className="min-h-screen bg-slate-50">
             <header className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4">
                 <span className="font-semibold text-slate-900">Time Capsule</span>
                 <div className="flex items-center gap-4">
+                    {isAdmin && (
+                        <Link href="/admin/users" className="text-sm font-medium text-indigo-600 hover:text-indigo-700">
+                            Admin
+                        </Link>
+                    )}
                     <Link href="/notifications" className="relative text-slate-600 hover:text-slate-900">
                         🔔
                         {unreadCount ? (

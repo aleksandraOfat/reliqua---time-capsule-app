@@ -1,0 +1,242 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Fraunces:wght@400;500&display=swap");
+
+.mv-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #faf7f2;
+    color: #222222;
+    font-family: "DM Sans", Arial, sans-serif;
+}
+
+.mv-content {
+    flex: 1 0 auto;
+}
+
+.mv-navbar {
+    height: 70px;
+    background: #1f3a2e;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 70px 0 32px;
+}
+
+.mv-brand {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    text-decoration: none;
+}
+
+.mv-logo { width: 50px; height: 50px; flex: 0 0 auto; }
+.mv-logo-small { width: 34px; height: 34px; }
+
+.mv-brand-name {
+    color: #ffffff;
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 36px;
+    line-height: 1;
+    font-weight: 400;
+}
+
+.mv-actions { display: flex; align-items: center; gap: 28px; }
+
+.mv-button {
+    min-width: 90px;
+    height: 40px;
+    border-radius: 7px;
+    border: 1px solid #d6ddd8;
+    background: transparent;
+    color: #ffffff;
+    font: 400 16px/1 "DM Sans", Arial, sans-serif;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.mv-button-primary { border-color: #efc9d9; background: #efc9d9; color: #222222; }
+
+.mv-hero { max-width: 760px; margin: 72px auto 0; text-align: center; padding: 0 24px; }
+
+.mv-kicker {
+    margin: 0 0 18px;
+    color: #c9916e;
+    font-family: Georgia, serif;
+    font-size: 24px;
+    line-height: 1.2;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.mv-title {
+    margin: 0;
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 56px;
+    line-height: 1.2;
+    font-weight: 400;
+}
+
+.mv-description {
+    max-width: 620px;
+    margin: 22px auto 0;
+    color: #757575;
+    font-size: 18px;
+    line-height: 1.4;
+    font-weight: 300;
+}
+
+.mv-cards {
+    width: min(952px, calc(100% - 48px));
+    margin: 64px auto 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 64px;
+}
+
+.mv-card {
+    min-height: 356px;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 36px 34px;
+}
+
+.mv-card-number { margin: 0 0 28px; color: #c9916e; font-family: Georgia, serif; font-size: 16px; }
+
+.mv-icon-box {
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
+    background: #f0e3d8;
+    display: grid;
+    place-items: center;
+    margin-bottom: 26px;
+}
+
+.mv-step-icon {
+    width: 38px; height: 38px;
+    fill: none; stroke: #1f1f1f; stroke-width: 2;
+    stroke-linecap: round; stroke-linejoin: round;
+}
+
+.mv-card h2 { margin: 0 0 12px; font-family: "Fraunces", Georgia, serif; font-size: 24px; font-weight: 400; }
+.mv-card-copy { margin: 0; max-width: 214px; color: #757575; font-size: 16px; line-height: 1.4; font-weight: 300; }
+
+.mv-cta {
+    margin: 64px auto 56px;
+    display: block;
+    border: 0;
+    background: transparent;
+    color: #222222;
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 32px;
+    line-height: 1.2;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+}
+
+
+.mv-footer {
+    flex: 0 0 auto;
+    border-top: 1px solid #d9d9d9;
+    background: #faf7f2;
+    padding: 28px 48px 20px;
+}
+
+.mv-footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.mv-footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.mv-footer-name {
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 18px;
+    color: #222222;
+}
+
+.mv-footer-tagline {
+    margin: 2px 0 0;
+    color: #9a9a9a;
+    font-size: 13px;
+}
+
+.mv-footer-links {
+    display: flex;
+    gap: 28px;
+}
+
+.mv-footer-links a {
+    color: #5a5a5a;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.mv-footer-links a:hover {
+    color: #1f3a2e;
+}
+
+
+.mv-footer-note {
+    margin: 20px 0 0;
+    padding-top: 16px;
+    border-top: 1px solid #ececec;
+    color: #9a9a9a;
+    font-size: 13px;
+    text-align: center;
+}
+
+@media (max-width: 560px) {
+    .mv-footer {
+        padding: 24px 24px 18px;
+    }
+    .mv-footer-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+}
+
+@media (max-width: 560px) {
+    .mv-footer-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
+}
+
+@media (max-width: 900px) {
+    .mv-navbar { padding: 0 24px; }
+    .mv-brand-name { font-size: 30px; }
+    .mv-actions { gap: 12px; }
+    .mv-cards { grid-template-columns: 1fr; gap: 24px; max-width: 360px; }
+}
+
+@media (max-width: 560px) {
+    .mv-navbar { height: auto; min-height: 86px; align-items: flex-start; flex-direction: column; gap: 14px; padding: 18px 20px; }
+    .mv-actions { width: 100%; }
+    .mv-button { flex: 1; }
+    .mv-hero { margin-top: 48px; }
+    .mv-kicker { font-size: 18px; }
+    .mv-title { font-size: 42px; }
+    .mv-description { font-size: 16px; }
+    .mv-cta { font-size: 26px; }
+    .mv-footer-inner { flex-direction: column; align-items: flex-start; gap: 12px; }
+}

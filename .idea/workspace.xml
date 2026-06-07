@@ -5,34 +5,33 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="71420f7f-d901-4af8-8d76-23acf01a2039" name="Changes" comment="added login and create basic capsule">
-      <change afterPath="$PROJECT_DIR$/app/(protected)/capsules/[id]/share/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/(protected)/capsules/[id]/share/share-form.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/(protected)/memories/memory-map.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/(protected)/memories/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/(protected)/notifications/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/(protected)/profile/actions.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/(protected)/profile/notification-toggles.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/(protected)/profile/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/(protected)/profile/profile-form.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/(marketing)/landing.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/(marketing)/layout.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/(marketing)/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/(marketing)/step-card.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/(protected)/admin/actions.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/(protected)/admin/audit/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/(protected)/admin/layout.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/(protected)/admin/users/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/(protected)/capsules/new/location-picker.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/deactivated/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/logo.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/site-footer.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/site-navbar.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AGENTS.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CLAUDE.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(protected)/capsules/[id]/done/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/capsules/[id]/done/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(protected)/capsules/[id]/edit/edit-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/capsules/[id]/edit/edit-form.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(protected)/capsules/[id]/files/[fileId]/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/capsules/[id]/files/[fileId]/route.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(protected)/capsules/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/capsules/[id]/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(protected)/capsules/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/capsules/actions.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(protected)/dashboard/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/dashboard/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(protected)/invitations/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/invitations/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(protected)/capsules/new/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/capsules/new/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(protected)/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/cron/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/cron/route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/auth/logout/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/auth/logout/route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/confirm-button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/confirm-button.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/crypto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/crypto.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/supabase/client.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/supabase/client.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/supabase/server.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/supabase/server.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(protected)/memories/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/memories/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(protected)/profile/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/profile/actions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(protected)/profile/profile-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/profile/profile-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/favicon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/globals.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/login/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/login/actions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/proxy.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,6 +41,7 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="CSS File" />
         <option value="TypeScript File" />
         <option value="TypeScript JSX File" />
       </list>
@@ -86,6 +86,7 @@
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -99,8 +100,8 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\aleks\WebstormProjects\memovault\app\(protected)\capsules\[id]\edit\" />
       <recent name="C:\Users\aleks\WebstormProjects\memovault\app\" />
+      <recent name="C:\Users\aleks\WebstormProjects\memovault\app\(protected)\capsules\[id]\edit\" />
     </key>
   </component>
   <component name="SharedIndexes">

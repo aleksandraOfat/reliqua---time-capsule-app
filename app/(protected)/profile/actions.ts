@@ -57,17 +57,23 @@ export async function updateAvatar(formData: FormData) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login')
-    if (!file || file.size === 0) redirect('/profile')
+
+    if (!file || file.size === 0) {
+        redirect('/profile')
+    }
 
     const ext = file.name.split('.').pop() || 'png'
     const path = `${user.id}/${crypto.randomUUID()}.${ext}`
+
     const bytes = Buffer.from(await file.arrayBuffer())
 
     const { error: upErr } = await supabase.storage
         .from('avatars')
         .upload(path, bytes, { contentType: file.type, upsert: true })
 
-    if (!upErr) {
+
+    if (upErr) {
+    } else {
         const { data: pub } = supabase.storage.from('avatars').getPublicUrl(path)
         await supabase.from('profiles').update({ avatar_url: pub.publicUrl }).eq('id', user.id)
     }
@@ -95,7 +101,6 @@ export async function deleteAccount() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login')
 
-    // Usuń pliki kapsuł użytkownika ze Storage (Storage nie ma kaskady)
     const { data: myCapsules } = await supabase
         .from('capsules')
         .select('id')
@@ -114,4 +119,24 @@ export async function deleteAccount() {
     await supabase.rpc('delete_my_account')
     await supabase.auth.signOut()
     redirect('/login')
+}
+
+export async function changePassword(
+    _prev: ProfileState,
+    formData: FormData
+): Promise<ProfileState> {
+    const password = formData.get('password') as string
+    const confirm = formData.get('confirm') as string
+
+    if (!password || password.length < 6) {
+        return { error: 'Password must be at least 6 characters.' }
+    }
+    if (password !== confirm) {
+        return { error: 'Passwords do not match.' }
+    }
+
+    const supabase = await createClient()
+    const { error } = await supabase.auth.updateUser({ password })
+    if (error) return { error: error.message }
+    return { success: 'Password updated.' }
 }
