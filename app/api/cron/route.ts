@@ -2,8 +2,14 @@ import {createClient} from '@/lib/supabase/server'
 import {NextResponse} from 'next/server'
 
 export async function GET(request: Request) {
-    const secret = request.headers.get('x-cron-secret')
-    if (secret !== process.env.CRON_SECRET){
+    const auth = request.headers.get('authorization')
+    const customSecret = request.headers.get('x-cron-secret')
+
+    const ok =
+        auth === `Bearer ${process.env.CRON_SECRET}` ||
+        customSecret === process.env.CRON_SECRET
+
+    if (!ok) {
         return new NextResponse('Unauthorized', { status: 401 })
     }
 
