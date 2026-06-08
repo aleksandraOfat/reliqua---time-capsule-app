@@ -1,7 +1,10 @@
-export default function Logo({ small = false }: { small?: boolean }) {
+export default function Logo({small = false, className,}: {
+    small?: boolean
+    className?: string
+}) {
     return (
         <svg
-            className={small ? 'mv-logo mv-logo-small' : 'mv-logo'}
+            className={className ?? (small ? 'mv-logo mv-logo-small' : 'mv-logo')}
             viewBox="0 0 64 64"
             aria-hidden="true"
         >
@@ -11,7 +14,7 @@ export default function Logo({ small = false }: { small?: boolean }) {
             <path d="M57 46L38 28" fill="none" stroke="#1f1f1f" strokeWidth="2" />
             <circle cx="32" cy="47" r="11" fill="#d2c681" />
             <text x="32" y="51" textAnchor="middle" fontSize="12" fontFamily="Georgia, serif" fill="#1f3a2e">
-                M
+                R
             </text>
         </svg>
     )

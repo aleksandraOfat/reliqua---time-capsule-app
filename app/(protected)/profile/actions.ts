@@ -43,13 +43,24 @@ export async function changeEmail(
     _prev: ProfileState,
     formData: FormData
 ): Promise<ProfileState> {
-    const email = (formData.get('email') as string)?.trim()
-    if (!email) return { error: 'Please enter an email.' }
+    const email = (formData.get('email') as string)?.trim().toLowerCase()
+
+    if (!email) {
+        return { error: 'Please enter an e-mail address.' }
+    }
 
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { error: 'Not signed in.' }
+
+    if (email === (user.email ?? '').toLowerCase()) {
+        return { error: 'This is already your e-mail address.' }
+    }
+
     const { error } = await supabase.auth.updateUser({ email })
     if (error) return { error: error.message }
-    return { success: 'Check your new email address to confirm the change.' }
+
+    return { success: 'Check your e-mail (including your current address) to confirm the change.' }
 }
 
 export async function updateAvatar(formData: FormData) {

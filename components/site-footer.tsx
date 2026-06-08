@@ -9,19 +9,19 @@ export default function SiteFooter() {
                 <div className="mv-footer-brand">
                     <Logo small />
                     <div>
-                        <span className="mv-footer-name">Memovault</span>
+                        <span className="mv-footer-name">Reliqua</span>
                         <p className="mv-footer-tagline">A letter to your future.</p>
                     </div>
                 </div>
 
                 <nav className="mv-footer-links" aria-label="Footer">
-                    <Link href="/login">Log in</Link>
-                    <Link href="/login">Register</Link>
+                    <Link href="/dashboard">Log in</Link>
+                    <Link href="/dashboard">Register</Link>
                     <Link href="/memories">Public memories</Link>
                 </nav>
             </div>
 
-            <p className="mv-footer-note">© {year} Memovault — engineering thesis project</p>
+            <p className="mv-footer-note">© {year} Reliqua — engineering thesis project</p>
         </footer>
     )
 }

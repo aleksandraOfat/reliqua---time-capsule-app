@@ -24,7 +24,6 @@ export default async function EditCapsulePage({
         notFound()
     }
 
-    // Edycja metadanych: tylko właściciel, tylko po zapieczętowaniu
     if (capsule.owner_id !== user?.id || capsule.status === 'collecting') {
         redirect(`/capsules/${id}`)
     }

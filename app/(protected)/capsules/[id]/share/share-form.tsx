@@ -37,11 +37,11 @@ export default function ShareForm({
                 if (markerRef.current) {
                     markerRef.current.setLatLng([la, ln])
                 } else {
-                    markerRef.current =L.circleMarker([la, ln], {
-                        radius: 8,
-                        color: '#047857',
-                        fillColor: '#10b981',
-                        fillOpacity: 0.8,
+                    markerRef.current = L.circleMarker([la, ln], {
+                        radius: 9,
+                        color: '#1f3a2e',
+                        fillColor: '#d3895b',
+                        fillOpacity: 0.9,
                         weight: 2,
                     }).addTo(map)
                 }
@@ -58,7 +58,7 @@ export default function ShareForm({
     }, [])
 
     const inputCls =
-        'w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200'
+        'mv-sans w-full rounded-lg border border-mv-border bg-white px-3 py-2.5 text-mv-ink outline-none focus:border-mv-green focus:ring-2 focus:ring-mv-green/20'
 
     const errorParam =
         typeof window !== 'undefined'
@@ -67,36 +67,41 @@ export default function ShareForm({
 
     return (
         <div className="mx-auto max-w-2xl">
+            <h1 className="mv-serif font-semibold text-mv-green" style={{ fontSize: '30px', lineHeight: 1.2 }}>
+                Share as public memory
+            </h1>
+            <p className="mv-sans mt-2 text-sm text-mv-muted">
+                Only the title, note and location become public. The capsule contents stay private.
+            </p>
+
             {errorParam === 'exists' && (
-                <p className="text-sm text-red-700">
+                <p className="mv-sans mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
                     This capsule already has a public memory. Remove it first to share a new one.
                 </p>
             )}
             {errorParam === '1' && (
-                <p className="text-sm text-red-700">Something went wrong. Please try again.</p>
+                <p className="mv-sans mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+                    Something went wrong. Please try again.
+                </p>
             )}
-            <h1 className="text-2xl font-semibold text-slate-900">Share as public memory</h1>
-            <p className="mt-1 text-sm text-slate-500">
-                Only the title, note and location become public. The capsule contents stay private.
-            </p>
 
-            <form action={shareMemory} className="mt-6 flex flex-col gap-4">
-                <input type="hidden" name="capsule_id" value={capsuleId}/>
-                <input type="hidden" name="lat" value={lat}/>
-                <input type="hidden" name="lng" value={lng}/>
+            <form action={shareMemory} className="mt-6 rounded-2xl border border-mv-border bg-mv-card p-6 shadow-sm">
+                <input type="hidden" name="capsule_id" value={capsuleId} />
+                <input type="hidden" name="lat" value={lat} />
+                <input type="hidden" name="lng" value={lng} />
 
-                <div className="flex flex-col gap-1">
-                    <label htmlFor="title" className="text-sm font-medium text-slate-700">Title</label>
-                    <input id="title" name="title" defaultValue={defaultTitle} required className={inputCls}/>
+                <div className="flex flex-col gap-1.5">
+                    <label htmlFor="title" className="mv-sans text-sm font-medium text-mv-ink">Title</label>
+                    <input id="title" name="title" defaultValue={defaultTitle} required className={inputCls} />
                 </div>
 
-                <div className="flex flex-col gap-1">
-                    <label htmlFor="note" className="text-sm font-medium text-slate-700">Note (optional)</label>
-                    <textarea id="note" name="note" rows={3} className={inputCls}/>
+                <div className="mt-4 flex flex-col gap-1.5">
+                    <label htmlFor="note" className="mv-sans text-sm font-medium text-mv-ink">Note (optional)</label>
+                    <textarea id="note" name="note" rows={3} className={`${inputCls} resize-none`} />
                 </div>
 
-                <div className="flex flex-col gap-1">
-                    <label htmlFor="cover" className="text-sm font-medium text-slate-700">
+                <div className="mt-4 flex flex-col gap-1.5">
+                    <label htmlFor="cover" className="mv-sans text-sm font-medium text-mv-ink">
                         Cover photo (optional, public)
                     </label>
                     <input
@@ -104,25 +109,32 @@ export default function ShareForm({
                         name="cover"
                         type="file"
                         accept="image/*"
-                        className="block w-full text-sm text-slate-600"
+                        className="mv-sans block w-full text-sm text-mv-muted file:mr-3 file:rounded-lg file:border-0 file:bg-mv-sand file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-mv-green"
                     />
-                    <span className="text-xs text-slate-400">
-            This image will be shown on the public map. It is separate from the private capsule files.
-          </span>
+                    <span className="mv-sans text-xs text-mv-muted">
+                        Shown on the public map. Separate from the private capsule files.
+                    </span>
                 </div>
 
-                <p className="text-sm font-medium text-slate-700">Click on the map to choose the location</p>
-                <div ref={containerRef} className="h-80 w-full rounded-xl border border-slate-200"/>
-                {lat && lng ? (
-                    <p className="text-sm text-slate-500">Selected location: {lat}, {lng}</p>
-                ) : (
-                    <p className="text-sm text-amber-700">No location selected yet.</p>
-                )}
+                <div className="mt-5">
+                    <p className="mv-sans text-sm font-medium text-mv-ink">Choose the location</p>
+                    <p className="mv-sans mb-2 text-xs text-mv-muted">Click on the map to place your memory.</p>
+                    <div
+                        ref={containerRef}
+                        className="w-full overflow-hidden rounded-xl border border-mv-border"
+                        style={{ height: '320px' }}
+                    />
+                    {lat && lng ? (
+                        <p className="mv-sans mt-2 text-sm text-mv-green">Selected: {lat}, {lng}</p>
+                    ) : (
+                        <p className="mv-sans mt-2 text-sm text-mv-clay">No location selected yet.</p>
+                    )}
+                </div>
 
                 <button
                     type="submit"
                     disabled={!lat || !lng}
-                    className="self-start rounded-lg bg-emerald-700 px-4 py-2 font-medium text-white hover:bg-emerald-800 disabled:opacity-40"
+                    className="mv-sans mt-6 rounded-lg bg-mv-green px-5 py-2.5 font-semibold text-white transition hover:bg-mv-green-hover disabled:opacity-40"
                 >
                     Share memory
                 </button>

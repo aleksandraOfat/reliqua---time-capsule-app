@@ -6,12 +6,12 @@ export default function SiteNavbar() {
         <header className="mv-navbar">
             <Link href="/" className="mv-brand">
                 <Logo />
-                <span className="mv-brand-name">Memovault</span>
+                <span className="mv-brand-name">Reliqua</span>
             </Link>
 
             <nav className="mv-actions" aria-label="Account">
-                <Link href="/login" className="mv-button">Log in</Link>
-                <Link href="/login" className="mv-button mv-button-primary">Register</Link>
+                <Link href="/dashboard" className="mv-button">Log in</Link>
+                <Link href="/dashboard" className="mv-button mv-button-primary">Register</Link>
             </nav>
         </header>
     )

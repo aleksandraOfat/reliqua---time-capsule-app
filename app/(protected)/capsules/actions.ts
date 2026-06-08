@@ -296,7 +296,7 @@ export async function checkUserExists(email: string): Promise<boolean> {
 }
 
 
-export type EditState = {error?: string }
+export type EditState = { error?: string; success?: string }
 
 export async function updateCapsuleMeta(
     _prevState: EditState,
@@ -338,7 +338,8 @@ export async function updateCapsuleMeta(
     }
 
     revalidatePath(`/capsules/${id}`)
-    redirect(`/capsules/${id}` )
+    return { success: 'Changes saved.' }
+    // redirect(`/capsules/${id}` )
 }
 
 async function canContribute(capsuleId: string): Promise<{ ok: boolean; userId?: string }> {

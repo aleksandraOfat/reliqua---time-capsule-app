@@ -6,7 +6,7 @@
     --color-mv-pink: #efc9d9;
     --color-mv-pink-hover: #e6b8cc;
     --color-mv-sand: #faf7f2;
-    --color-mv-clay: #c9916e;
+    --color-mv-clay: #d3895b;
     --color-mv-ink: #222222;
     --color-mv-muted: #757575;
     --color-mv-border: #e4ddd2;
@@ -22,4 +22,16 @@ body {
 .mv-heading {
     font-family: "Fraunces", Georgia, serif;
     font-weight: 500;
+}
+
+.mv-serif {
+    font-family: "Ancizar Serif", Georgia, serif;
+}
+
+.mv-sans {
+    font-family: "DM Sans", Arial, sans-serif;
+}
+.mv-login-logo {
+    width: 48px;
+    height: 48px;
 }

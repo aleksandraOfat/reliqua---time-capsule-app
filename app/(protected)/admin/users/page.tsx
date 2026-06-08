@@ -8,40 +8,51 @@ export default async function AdminUsersPage() {
 
     return (
         <div>
-            <h1 className="text-2xl font-semibold text-slate-900">Users</h1>
-            <p className="mt-1 text-sm text-slate-500">{list.length} registered users.</p>
+            <p className="mv-sans text-sm text-mv-muted">{list.length} registered users.</p>
 
-            <ul className="mt-6 flex flex-col gap-2">
+            <ul className="mt-5 flex flex-col gap-3">
                 {list.map((u: any) => (
                     <li
                         key={u.id}
-                        className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4"
+                        className="flex items-center justify-between gap-3 rounded-2xl border border-mv-border bg-mv-card p-4 shadow-sm"
                     >
-                        <div className="min-w-0">
-                            <p className="truncate font-medium text-slate-900">
-                                {[u.first_name, u.last_name].filter(Boolean).join(' ') || u.email}
-                            </p>
-                            <p className="text-sm text-slate-500">{u.email}</p>
+                        <div className="flex min-w-0 items-center gap-3">
+                            <span
+                                className="grid shrink-0 place-items-center rounded-full bg-mv-pink text-sm font-semibold text-mv-green"
+                                style={{ width: '40px', height: '40px', minWidth: '40px', minHeight: '40px' }}
+                            >
+                                {([u.first_name, u.last_name].filter(Boolean).join(' ') || u.email || '?').charAt(0).toUpperCase()}
+                            </span>
+                            <div className="min-w-0">
+                                <p className="mv-sans truncate font-medium text-mv-ink">
+                                    {[u.first_name, u.last_name].filter(Boolean).join(' ') || u.email}
+                                </p>
+                                <p className="mv-sans truncate text-sm text-mv-muted">{u.email}</p>
+                            </div>
                         </div>
 
-                        <div className="flex items-center gap-3">
-              <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                  u.role === 'admin' ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-600'
-              }`}>
-                {u.role}
-              </span>
-                            <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                                u.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                        <div className="flex shrink-0 items-center gap-3">
+                            <span className={`ml-2 rounded-full px-2 py-0.5 text-xs font-medium ${
+                                u.role === 'admin' ? 'bg-[#e7efe9] text-mv-green' : 'bg-mv-sand text-mv-muted'
                             }`}>
-                {u.is_active ? 'active' : 'inactive'}
-              </span>
+                                {u.role}
+                            </span>
+                            <span className={`ml-2 rounded-full px-2 py-0.5 text-xs font-medium ${
+                                u.is_active ? 'bg-[#e7efe9] text-mv-green' : 'bg-red-100 text-red-700'
+                            }`}>
+                                {u.is_active ? 'active' : 'inactive'}
+                            </span>
 
                             <form action={setUserActive}>
                                 <input type="hidden" name="user_id" value={u.id} />
                                 <input type="hidden" name="active" value={(!u.is_active).toString()} />
                                 <button
                                     type="submit"
-                                    className="rounded-lg border border-slate-300 px-3 py-1 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                                    className={`mv-sans rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+                                        u.is_active
+                                            ? 'border border-red-300 text-red-600 hover:bg-red-50'
+                                            : 'bg-mv-green text-white hover:bg-mv-green-hover'
+                                    }`}
                                 >
                                     {u.is_active ? 'Deactivate' : 'Activate'}
                                 </button>

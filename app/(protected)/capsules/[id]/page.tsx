@@ -5,6 +5,10 @@ import {createClient } from '@/lib/supabase/server'
 import {decrypt} from '@/lib/crypto'
 import {openCapsule, inviteMember, removeMember, addContribution,addContributionFile, sealNow, finishContribution, deleteContribution, deleteContributionFile,deleteCapsule,deleteMemory} from '../actions'
 import ConfirmButton from '@/components/confirm-button'
+import CapsuleHeader from '@/components/capsule-header'
+import CollectingPanel from './collecting-panel'
+import { OpenedView, ReadyView, SealedView, ReadyNotOwner } from './capsule-states'
+import OwnerTools from './owner-tools'
 
 
 export default async function CapsulePage({
@@ -53,6 +57,44 @@ export default async function CapsulePage({
     const windowStarted = sealDeadline !== null
     const windowOpen = isCollecting && (sealDeadline === null || sealDeadline > now)
     const hoursLeft = sealDeadline ? Math.max(0, Math.ceil((sealDeadline - now) / 3_600_000)) : null
+    const lifecycleState: 'collecting' | 'sealed' | 'ready' | 'opened' =
+        isOpened ? 'opened' : isCollecting ? 'collecting' : isReady ? 'ready' : 'sealed'
+
+    const createdMsCap = new Date(capsule.created_at).getTime()
+    const pct = (from: number, to: number) =>
+        to <= from ? 100 : Math.min(100, Math.max(0, ((now - from) / (to - from)) * 100))
+
+    let progressPct: number | null = null
+    let progressLabel = 'Status'
+    let progressValue = ''
+
+    if (lifecycleState === 'collecting') {
+        progressLabel = 'Seals in'
+        if (sealDeadline) {
+            progressPct = pct(createdMsCap, sealDeadline)
+            const totalH = Math.max(0, Math.ceil((sealDeadline - now) / 3_600_000))
+            const d = Math.floor(totalH / 24)
+            const h = totalH % 24
+            progressValue = d > 0 ? `~${d} ${d === 1 ? 'day' : 'days'} ${h} h` : `~${h} h`
+        } else {
+            progressValue = 'soon'
+            progressPct = 8
+        }
+    } else if (lifecycleState === 'sealed') {
+        progressLabel = 'Opens in'
+        if (openMs) {
+            progressPct = pct(createdMsCap, openMs)
+            progressValue = daysLeft !== null ? `~${daysLeft} ${daysLeft === 1 ? 'day' : 'days'}` : ''
+        }
+    } else if (lifecycleState === 'ready') {
+        progressLabel = 'Status'
+        progressValue = 'Ready now'
+        progressPct = 100
+    } else {
+        progressLabel = 'Status'
+        progressValue = 'Opened'
+        progressPct = 100
+    }
 
     let canContribute = false
     if (isCollecting && user) {
@@ -160,430 +202,69 @@ export default async function CapsulePage({
 
 
     return (
-        <div className="mx-auto max-w-lg">
-            <Link href="/dashboard" className="text-sm text-slate-500 hover:text-slate-700">
+        <div className="mx-auto max-w-2xl">
+            <Link href="/dashboard" className="mv-sans text-sm text-mv-muted transition hover:text-mv-green">
                 ← Back to dashboard
             </Link>
 
-            <h1 className="mt-3 text-2xl font-semibold text-slate-900">{capsule.title}</h1>
-            <p className="mt-1 text-sm text-slate-500">
-                {openDate ? `Opens ${new Date(openDate).toLocaleString()}` : 'No open date set'}
-            </p>
-
-            {capsule.description && (
-                <p className="mt-2 text-slate-600">{capsule.description}</p>
-            )}
-
-            {isOwner && !isCollecting && (
-                <Link
-                    href={`/capsules/${id}/edit`}
-                    className="mt-3 inline-block rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-                >
-                    Edit details
-                </Link>
-            )}
+            <div className="mt-3">
+                <CapsuleHeader
+                    id={id}
+                    title={capsule.title}
+                    description={capsule.description}
+                    openDate={openDate}
+                    state={lifecycleState}
+                    progressPct={progressPct}
+                    progressLabel={progressLabel}
+                    progressValue={progressValue}
+                    canEdit={isOwner && !isCollecting}
+                    isOwner={isOwner}
+                    myMemoryId={myMemoryId}
+                />
+            </div>
 
             {isOpened && (
-                <div className="mt-6 flex flex-col gap-4">
-                    <div className="rounded-xl border border-slate-200 bg-white p-5">
-                        <p className="mb-3 text-xs font-medium uppercase tracking-wide text-slate-400">
-                            Messages
-                        </p>
-                        {openedContributions.length === 0 ? (
-                            <p className="text-slate-500">This capsule has no messages.</p>
-                        ) : (
-                            <ul className="flex flex-col gap-3">
-                                {openedContributions.map((c, i) => (
-                                    <li key={i} className="rounded-lg bg-slate-50 p-3">
-                                        <p className="whitespace-pre-wrap text-slate-800">{c.message || '(empty)'}</p>
-                                        <p className="mt-1 text-xs text-slate-400">— {c.author_name}</p>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </div>
-
-                    {files.length > 0 && (
-                        <div className="rounded-xl border border-slate-200 bg-white p-5">
-                            <p className="mb-3 text-xs font-medium uppercase tracking-wide text-slate-400">
-                                Files
-                            </p>
-                            <ul className="flex flex-col gap-3">
-                                {files.map((f) => {
-                                    const isImage = f.mime_type?.startsWith('image/')
-                                    return (
-                                        <li key={f.id} className="flex flex-col gap-2">
-                                            {isImage && (
-                                                <img
-                                                    src={`/capsules/${id}/files/${f.id}`}
-                                                    alt={f.file_name}
-                                                    className="max-h-80 rounded-lg border border-slate-200 object-contain"
-                                                />
-                                            )}
-
-                                            <a
-                                                href={`/capsules/${id}/files/${f.id}`}
-                                                download={f.file_name}
-                                                className="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-700"
-                                            >
-                                                ↓ {f.file_name}
-                                            </a>
-                                        </li>
-                                    )
-                                })}
-                            </ul>
-                        </div>
-                    )}
-                </div>
+                <OpenedView
+                    id={id}
+                    contributions={openedContributions}
+                    files={files}
+                    isOwner={isOwner}
+                    myMemoryId={myMemoryId}
+                />
             )}
 
-            {isOpened && isOwner && (
-                myMemoryId ? (
-                    <form action={deleteMemory} className="mt-4">
-                        <input type="hidden" name="memory_id" value={myMemoryId}/>
-                        <input type="hidden" name="capsule_id" value={id}/>
-                        <input type="hidden" name="return_to" value={`/capsules/${id}`}/>
-                        <ConfirmButton
-                            message="Remove this capsule's memory from the public map?"
-                            className="inline-block rounded-lg border border-red-300 px-3 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
-                        >
-                            Remove from public map
-                        </ConfirmButton>
-                    </form>
-                ) : (
-                    <Link
-                        href={`/capsules/${id}/share`}
-                        className="mt-4 inline-block rounded-lg border border-emerald-300 px-3 py-1.5 text-sm font-medium text-emerald-700 transition hover:bg-emerald-50"
-                    >
-                        Share as public memory
-                    </Link>
-                )
-            )}
 
             {isCollecting && (
-                <div className="mt-6 flex flex-col gap-4">
-                    <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
-                        This capsule is collecting memories. Everyone who joined can see what&apos;s
-                        inside and keep adding.
-                    </div>
-
-                    {(contributions.length > 0 || collectingFiles.length > 0) && (
-                        <div className="rounded-xl border border-slate-200 bg-white p-5">
-                            <p className="mb-3 text-xs font-medium uppercase tracking-wide text-slate-400">
-                                In this capsule so far
-                            </p>
-
-                            <ul className="flex flex-col gap-3">
-                                {contributions.map((c) => (
-                                    <li key={c.content_id} className="rounded-lg bg-slate-50 p-3">
-                                        <p className="whitespace-pre-wrap text-sm text-slate-800">
-                                            {c.message || '(empty message)'}
-                                        </p>
-                                        <p className="mt-1 text-xs text-slate-400">
-                                            Added by {c.author_name}
-                                        </p>
-                                        {c.author_id === user?.id && windowOpen && (
-                                            <form action={deleteContribution} className="mt-2">
-                                                <input type="hidden" name="capsule_id" value={capsule.id} />
-                                                <input type="hidden" name="content_id" value={c.content_id} />
-                                                <button
-                                                    type="submit"
-                                                    className="text-xs font-medium text-red-600 hover:text-red-700"
-                                                >
-                                                    Delete
-                                                </button>
-
-                                            </form>
-                                        )}
-                                    </li>
-                                ))}
-                            </ul>
-
-                            {collectingFiles.length > 0 && (
-                                <ul className="mt-3 flex flex-col gap-2">
-                                    {collectingFiles.map((f) => {
-                                        const isImage = f.mime_type?.startsWith('image/')
-                                        return (
-                                            <li key={f.id} className="flex flex-col gap-2">
-                                                {isImage && (
-                                                    <img
-                                                        src={`/capsules/${id}/files/${f.id}`}
-                                                        alt={f.file_name}
-                                                        className="max-h-60 rounded-lg border border-slate-200 object-contain"
-                                                    />
-                                                )}
-
-                                                <a
-                                                    href={`/capsules/${id}/files/${f.id}`}
-                                                    download={f.file_name}
-                                                    className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
-                                                >
-                                                    ↓ {f.file_name}
-                                                </a>
-                                                {f.author_id === user?.id && windowOpen && (
-                                                    <form action={deleteContributionFile}>
-                                                        <input type="hidden" name="capsule_id" value={capsule.id}/>
-                                                        <input type="hidden" name="file_id" value={f.id}/>
-                                                        <button
-                                                            type="submit"
-                                                            className="self-start text-xs font-medium text-red-600 hover:text-red-700"
-                                                        >
-                                                            Delete file
-                                                        </button>
-                                                    </form>
-                                                )}
-                                            </li>
-                                        )
-                                    })}
-                                </ul>
-                            )}
-                        </div>
-                    )}
-
-
-                    {canContribute ? (
-                        <>
-                            <form action={addContribution} className="rounded-xl border border-slate-200 bg-white p-5">
-                                <input type="hidden" name="capsule_id" value={capsule.id} />
-                                <label className="text-sm font-medium text-slate-700">
-                                    Add your message
-                                </label>
-                                <textarea
-                                    name="message"
-                                    rows={3}
-                                    className="mt-1 w-full resize-none rounded-lg border border-slate-300 px-3 py-2 text-slate-900 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
-                                />
-                                <button
-                                    type="submit"
-                                    className="mt-3 rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800"
-                                >
-                                    Add message
-                                </button>
-                            </form>
-
-                            <form action={addContributionFile} className="rounded-xl border border-slate-200 bg-white p-5">
-                                <input type="hidden" name="capsule_id" value={capsule.id} />
-                                <label className="text-sm font-medium text-slate-700">
-                                    Add a photo or file
-                                </label>
-                                <input
-                                    type="file"
-                                    name="file"
-                                    className="mt-1 block w-full text-sm text-slate-600"
-                                />
-                                <button
-                                    type="submit"
-                                    className="mt-3 rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800"
-                                >
-                                    Add file
-                                </button>
-                            </form>
-                        </>
-                    ) : (
-                        <div className="rounded-xl border border-slate-200 bg-white p-5 text-sm text-slate-600">
-                            You don&apos;t have permission to add to this capsule.
-                        </div>
-                    )}
-
-                    {isOwner && (
-                        <Link
-                            href={`/capsules/${id}/share`}
-                            className="inline-block rounded-lg border border-emerald-300 px-3 py-1.5 text-sm font-medium text-emerald-700 transition hover:bg-emerald-50"
-                        >
-                            Share as public memory
-                        </Link>
-                    )}
-                    {isOwner && (
-                        <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
-                            <p className="text-sm text-amber-800">
-                                {hoursLeft !== null
-                                    ? `You can edit this capsule for about ${hoursLeft} more hour(s). After that it will be sealed automatically.`
-                                    : 'This capsule will be sealed soon.'}
-                                {' '}You can also seal it permanently now.
-                            </p>
-                            <form action={sealNow} className="mt-3">
-                                <input type="hidden" name="capsule_id" value={capsule.id} />
-                                <button
-                                    type="submit"
-                                    className="rounded-lg bg-amber-700 px-4 py-2 text-sm font-medium text-white hover:bg-amber-800"
-                                >
-                                    Seal now (final)
-                                </button>
-                            </form>
-                        </div>
-                    )}
-                    )
-
-                    {!isOwner && canContribute && windowOpen &&(
-                        <form action={finishContribution} className="rounded-xl border border-slate-200 bg-white p-5">
-                            <input type="hidden" name="capsule_id" value={capsule.id} />
-                            <p className="text-sm text-slate-600">
-                                Done adding your memories? Let the owner know you&apos;ve finished.
-                            </p>
-                            <button
-                                type="submit"
-                                className="mt-3 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                            >
-                                I&apos;m done contributing
-                            </button>
-                        </form>
-                    )}
-                </div>
+                <CollectingPanel
+                    id={id}
+                    contributions={contributions}
+                    collectingFiles={collectingFiles}
+                    canContribute={canContribute}
+                    windowOpen={windowOpen}
+                    isOwner={isOwner}
+                    userId={user?.id}
+                    hoursLeft={hoursLeft}
+                    myMemoryId={myMemoryId}
+                />
             )}
 
             {!isOpened && isReady && isOwner && (
-                <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-5">
-                    <p className="text-amber-800">This capsule is ready to be opened.</p>
-
-                    {hasPassword && (
-                        <p className="mt-1 text-sm text-slate-600">
-                            This capsule is password protected.
-                        </p>
-                    )}
-
-                    {locked && (
-                        <p className="mt-2 text-sm text-red-700">
-                            The open date has not been reached yet.
-                        </p>
-                    )}
-
-                    {error === 'password' && (
-                        <p className="mt-2 text-sm text-red-700">
-                            Incorrect password. Please try again.
-                        </p>
-                    )}
-
-                    <form action={openCapsule} className="mt-4 flex flex-col gap-3">
-                        <input type="hidden" name="capsule_id" value={capsule.id} />
-                        {hasPassword && (
-                            <input
-                                type="password"
-                                name="capsule_password"
-                                placeholder="Enter capsule password"
-                                required
-                                className="rounded-lg border border-slate-300 px-3 py-2 text-slate-900 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
-                            />
-                        )}
-                        <button
-                            type="submit"
-                            className="rounded-lg bg-amber-700 px-4 py-2 font-medium text-white transition hover:bg-amber-800"
-                        >
-                            Open capsule
-                        </button>
-                    </form>
-                </div>
+                <ReadyView
+                    id={id}
+                    hasPassword={hasPassword}
+                    locked={!!locked}
+                    passwordError={error === 'password'}
+                />
             )}
 
-            {!isOpened && isReady && !isOwner && (
-                <div className="mt-6 rounded-xl border border-slate-200 bg-white p-5 text-slate-600">
-                    Only the owner can open this capsule.
-                </div>
-            )}
+            {!isOpened && isReady && !isOwner && <ReadyNotOwner />}
 
-            {!isOpened && !isReady && !isCollecting && (
-                <div className="mt-6 rounded-xl border border-slate-200 bg-white p-5">
-                    <p className="text-slate-700">This capsule is still sealed.</p>
-                    {daysLeft !== null && (
-                        <p className="mt-1 text-sm text-slate-500">
-                            {daysLeft} {daysLeft === 1 ? 'day' : 'days'} until it can be opened.
-                        </p>
-                    )}
-                </div>
-            )}
+            {!isOpened && !isReady && !isCollecting && <SealedView daysLeft={daysLeft} />}
 
             {isOwner && (
-                <div className="mt-6 rounded-xl border border-slate-200 bg-white p-5">
-                    <h2 className="text-lg font-medium text-slate-900">Collaborators</h2>
-                    <p className="mt-1 text-sm text-slate-500">
-                        Invite people to view this capsule once it is opened.
-                    </p>
-
-                    {inviteResult && (
-                        <p
-                            className={`mt-3 rounded-lg px-3 py-2 text-sm ${
-                                inviteResult.ok
-                                    ? 'bg-green-50 text-green-700'
-                                    : 'bg-red-50 text-red-700'
-                            }`}
-                        >
-                            {inviteResult.text}
-                        </p>
-                    )}
-
-                    <form
-                        action={inviteMember}
-                        className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center"
-                    >
-                        <input type="hidden" name="capsule_id" value={capsule.id} />
-                        <input
-                            type="email"
-                            name="email"
-                            placeholder="friend@example.com"
-                            required
-                            className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-                        />
-                        <select
-                            name="role"
-                            defaultValue="viewer"
-                            className="rounded-lg border border-slate-300 px-3 py-2 text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-                        >
-                            <option value="viewer">Viewer</option>
-                            <option value="editor">Editor</option>
-                        </select>
-                        <button
-                            type="submit"
-                            className="rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white transition hover:bg-indigo-700"
-                        >
-                            Invite
-                        </button>
-                    </form>
-
-                    {members.length > 0 && (
-                        <ul className="mt-4 flex flex-col gap-2">
-                            {members.map((m) =>(
-                                <li
-                                    key={m.member_id}
-                                    className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2"
-                                >
-                  <span className="text-sm text-slate-700">
-                    {m.email}
-                      <span className="text-slate-400"> · {m.member_role}</span>
-                  </span>
-                                    <form action={removeMember}>
-                                        <input type="hidden" name="capsule_id" value={capsule.id} />
-                                        <input type="hidden" name="member_id" value={m.member_id} />
-                                        <button
-                                            type="submit"
-                                            className="text-sm font-medium text-red-600 transition hover:text-red-700"
-                                        >
-                                            Remove
-                                        </button>
-                                    </form>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </div>
+                <OwnerTools id={id} members={members} inviteResult={inviteResult} />
             )}
 
-            {isOwner && (
-                <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-5">
-                    <h2 className="text-sm font-medium text-red-800">Danger zone</h2>
-                    <p className="mt-1 text-sm text-red-700">
-                        Deleting this capsule permanently removes all its messages and files.
-                    </p>
-                    <form action={deleteCapsule} className="mt-3">
-                        <input type="hidden" name="capsule_id" value={capsule.id} />
-                        <ConfirmButton
-
-                            message="Delete this capsule permanently? This cannot be undone."
-                            className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
-                        >
-                            Delete capsule
-                        </ConfirmButton>
-                    </form>
-                </div>
-            )}
         </div>
     )
     }

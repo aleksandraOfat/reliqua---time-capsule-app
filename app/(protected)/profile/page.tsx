@@ -18,6 +18,10 @@ export default async function ProfilePage() {
 
     return (
         <div className="mx-auto max-w-2xl">
+            <h1 className="mv-serif mb-6 font-semibold text-mv-green" style={{fontSize: '30px', lineHeight: 1.2}}>
+                Profile
+            </h1>
+
             <ProfileForm
                 avatarUrl={profile?.avatar_url ?? null}
                 fullName={fullName}
@@ -25,31 +29,29 @@ export default async function ProfilePage() {
                 email={user?.email ?? ''}
             />
 
-            <h2 className="mt-10 text-sm font-medium uppercase tracking-wide text-slate-400">
-                Notifications
-            </h2>
-            <NotificationToggles
-                prefs={{
-                    notify_opening: profile?.notify_opening ?? true,
-                    notify_reminder: profile?.notify_reminder ?? true,
-                    notify_invitations: profile?.notify_invitations ?? true,
-                    notify_group_activity: profile?.notify_group_activity ?? true,
-                }}
-            />
+            <div className="mt-6 rounded-2xl border border-mv-border bg-mv-card p-6 shadow-sm">
+                <p className="mv-serif text-base font-semibold text-mv-green">Notifications</p>
+                <NotificationToggles
+                    prefs={{
+                        notify_opening: profile?.notify_opening ?? true,
+                        notify_reminder: profile?.notify_reminder ?? true,
+                        notify_invitations: profile?.notify_invitations ?? true,
+                        notify_group_activity: profile?.notify_group_activity ?? true,
+                    }}
+                />
+            </div>
 
-            <div className="mt-10 flex items-center justify-between border-t border-slate-200 pt-6">
-                <div>
-                    <h2 className="text-sm font-medium text-slate-800">Delete account</h2>
-                    <p className="text-sm text-slate-500">
-                        This permanently deletes your account and all your capsules.
-                    </p>
-                </div>
-                <form action={deleteAccount}>
+            <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-6">
+                <p className="mv-serif text-base font-semibold text-red-800">Delete account</p>
+                <p className="mv-sans mt-1 text-sm text-red-700">
+                    This permanently deletes your account and all your capsules. This cannot be undone.
+                </p>
+                <form action={deleteAccount} className="mt-4">
                     <ConfirmButton
                         message="Delete your account permanently? All your capsules will be lost. This cannot be undone."
-                        className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+                        className="mv-sans inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-lg bg-red-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
                     >
-                        Delete Account
+                        Delete account
                     </ConfirmButton>
                 </form>
             </div>

@@ -14,7 +14,7 @@ const ACTION_LABELS: Record<string, string> = {
 }
 
 const inputCls =
-    'rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200'
+    'mv-sans rounded-lg border border-mv-border bg-white px-3 py-2 text-sm text-mv-ink outline-none focus:border-mv-green focus:ring-2 focus:ring-mv-green/20'
 
 export default async function AdminAuditPage({
                                                  searchParams,
@@ -38,12 +38,11 @@ export default async function AdminAuditPage({
 
     return (
         <div>
-            <h1 className="text-2xl font-semibold text-slate-900">Audit log</h1>
-            <p className="mt-1 text-sm text-slate-500">{list.length} events.</p>
-            <form method="get" className="mt-6 flex flex-wrap items-end gap-3">
+            <p className="mv-sans text-sm text-mv-muted">{list.length} events.</p>
 
+            <form method="get" className="mt-5 flex flex-wrap items-end gap-3 rounded-2xl border border-mv-border bg-mv-card p-4 shadow-sm">
                 <div className="flex flex-col gap-1">
-                    <label className="text-xs font-medium text-slate-500">Action</label>
+                    <label className="mv-sans text-xs font-medium text-mv-muted">Action</label>
                     <select name="action" defaultValue={action ?? ''} className={inputCls}>
                         <option value="">All actions</option>
                         {actions.map((a: any) => (
@@ -54,63 +53,59 @@ export default async function AdminAuditPage({
                     </select>
                 </div>
                 <div className="flex flex-col gap-1">
-                    <label className="text-xs font-medium text-slate-500">User email</label>
-                    <input name="actor" defaultValue={actor ?? ''} placeholder="contains…" className={inputCls}/>
+                    <label className="mv-sans text-xs font-medium text-mv-muted">User email</label>
+                    <input name="actor" defaultValue={actor ?? ''} placeholder="contains…" className={inputCls} />
                 </div>
-
                 <div className="flex flex-col gap-1">
-                    <label className="text-xs font-medium text-slate-500">From</label>
-                    <input type="date" name="from" defaultValue={from ?? ''} className={inputCls}/>
+                    <label className="mv-sans text-xs font-medium text-mv-muted">From</label>
+                    <input type="date" name="from" defaultValue={from ?? ''} className={inputCls} />
                 </div>
-
                 <div className="flex flex-col gap-1">
-                    <label className="text-xs font-medium text-slate-500">To</label>
-                    <input type="date" name="to" defaultValue={to ?? ''} className={inputCls}/>
+                    <label className="mv-sans text-xs font-medium text-mv-muted">To</label>
+                    <input type="date" name="to" defaultValue={to ?? ''} className={inputCls} />
                 </div>
                 <button
                     type="submit"
-                    className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+                    className="mv-sans rounded-lg bg-mv-green px-4 py-2 text-sm font-semibold text-white transition hover:bg-mv-green-hover"
                 >
                     Filter
                 </button>
-
                 <a
                     href="/admin/audit"
-                    className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                    className="mv-sans rounded-lg border border-mv-border px-4 py-2 text-sm font-medium text-mv-green transition hover:bg-mv-sand"
                 >
                     Clear
                 </a>
-
-
             </form>
-            <div className="mt-6 overflow-x-auto rounded-xl border border-slate-200">
+
+            <div className="mt-6 overflow-x-auto rounded-2xl border border-mv-border bg-mv-card shadow-sm">
                 <table className="w-full text-left text-sm">
-                    <thead className="bg-slate-50 text-slate-500">
+                    <thead className="bg-mv-sand text-mv-muted">
                     <tr>
-                        <th className="px-4 py-2 font-medium">When</th>
-                        <th className="px-4 py-2 font-medium">Who</th>
-                        <th className="px-4 py-2 font-medium">Action</th>
-                        <th className="px-4 py-2 font-medium">Entity</th>
+                        <th className="mv-sans px-4 py-3 font-medium">When</th>
+                        <th className="mv-sans px-4 py-3 font-medium">Who</th>
+                        <th className="mv-sans px-4 py-3 font-medium">Action</th>
+                        <th className="mv-sans px-4 py-3 font-medium">Entity</th>
                     </tr>
                     </thead>
                     <tbody>
                     {list.length === 0 ? (
                         <tr>
-                            <td colSpan={4} className="px-4 py-6 text-center text-slate-400">
+                            <td colSpan={4} className="mv-sans px-4 py-6 text-center text-mv-muted">
                                 No events match these filters.
                             </td>
                         </tr>
                     ) : (
                         list.map((e: any) => (
-                            <tr key={e.id} className="border-t border-slate-100">
-                                <td className="px-4 py-2 text-slate-500">
+                            <tr key={e.id} className="border-t border-mv-border">
+                                <td className="mv-sans px-4 py-3 text-mv-muted">
                                     {new Date(e.created_at).toLocaleString()}
                                 </td>
-                                <td className="px-4 py-2 text-slate-700">{e.actor_email ?? '—'}</td>
-                                <td className="px-4 py-2 text-slate-900">
+                                <td className="mv-sans px-4 py-3 text-mv-ink">{e.actor_email ?? '—'}</td>
+                                <td className="mv-sans px-4 py-3 text-mv-ink">
                                     {ACTION_LABELS[e.action] ?? e.action}
                                 </td>
-                                <td className="px-4 py-2 text-slate-400">{e.entity_type}</td>
+                                <td className="mv-sans px-4 py-3 text-mv-muted">{e.entity_type}</td>
                             </tr>
                         ))
                     )}

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import StepCard from './step-card'
 
-export default function MemovaultStartPage() {
+export default function StartPage() {
     return (
         <main className="mv-page-content">
             <section className="mv-hero">
@@ -17,7 +17,7 @@ export default function MemovaultStartPage() {
                 </p>
             </section>
 
-            <section className="mv-cards" aria-label="How Memovault works">
+            <section className="mv-cards" aria-label="How Reliqua works">
                 <StepCard
                     number="01"
                     icon="folder"
@@ -38,7 +38,7 @@ export default function MemovaultStartPage() {
                 />
             </section>
 
-            <Link href="/login" className="mv-cta">
+            <Link href="/dashboard" className="mv-cta">
                 Create your first capsule →
             </Link>
         </main>
