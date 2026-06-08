@@ -13,6 +13,11 @@ export async function setUserActive(formData: FormData) {
     if (!user) redirect('/login')
 
     await supabase.rpc('admin_set_active', { target_id: targetId, active})
+    await supabase.rpc('log_audit', {
+        p_action: active ? 'admin_activate_user' : 'admin_deactivate_user',
+        p_entity_type: 'user',
+        p_entity_id: targetId,
+    })
 
     revalidatePath('/admin/users')
 }

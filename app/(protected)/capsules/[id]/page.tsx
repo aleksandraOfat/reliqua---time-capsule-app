@@ -86,22 +86,22 @@ export default async function CapsulePage({
     }
     const inviteResult = invite ? inviteMessages[invite] : null
 
-    let message: string | null = null
-    if (isOpened) {
-        const { data: content } = await supabase
-            .from('capsule_contents')
-            .select('encrypted_message')
-            .eq('capsule_id', id)
-            .maybeSingle()
 
-        if (content?.encrypted_message) {
+    let openedContributions: Array<{ message: string; author_name: string }> = []
+    if (isOpened) {
+        const { data: rows } = await supabase.rpc('get_capsule_contents_with_authors', { cap_id: id })
+        openedContributions = (rows ?? []).map((r: any) => {
+            let text = ''
             try {
-                message = decrypt(content.encrypted_message)
+                text = r.encrypted_message ? decrypt(r.encrypted_message) : ''
             } catch {
-                message = '[Unable to decrypt this message.]'
+                text = '[Unable to decrypt]'
             }
-        }
+            return { message: text, author_name: r.author_name ?? 'Unknown' }
+        })
     }
+
+
 
     let contributions: Array<{
         content_id: string
@@ -186,12 +186,21 @@ export default async function CapsulePage({
             {isOpened && (
                 <div className="mt-6 flex flex-col gap-4">
                     <div className="rounded-xl border border-slate-200 bg-white p-5">
-                        <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-400">
-                            Message
+                        <p className="mb-3 text-xs font-medium uppercase tracking-wide text-slate-400">
+                            Messages
                         </p>
-                        <p className="whitespace-pre-wrap text-slate-800">
-                            {message || 'This capsule has no message.'}
-                        </p>
+                        {openedContributions.length === 0 ? (
+                            <p className="text-slate-500">This capsule has no messages.</p>
+                        ) : (
+                            <ul className="flex flex-col gap-3">
+                                {openedContributions.map((c, i) => (
+                                    <li key={i} className="rounded-lg bg-slate-50 p-3">
+                                        <p className="whitespace-pre-wrap text-slate-800">{c.message || '(empty)'}</p>
+                                        <p className="mt-1 text-xs text-slate-400">— {c.author_name}</p>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
                     </div>
 
                     {files.length > 0 && (
@@ -231,9 +240,9 @@ export default async function CapsulePage({
             {isOpened && isOwner && (
                 myMemoryId ? (
                     <form action={deleteMemory} className="mt-4">
-                        <input type="hidden" name="memory_id" value={myMemoryId} />
-                        <input type="hidden" name="capsule_id" value={id} />
-                        <input type="hidden" name="return_to" value={`/capsules/${id}`} />
+                        <input type="hidden" name="memory_id" value={myMemoryId}/>
+                        <input type="hidden" name="capsule_id" value={id}/>
+                        <input type="hidden" name="return_to" value={`/capsules/${id}`}/>
                         <ConfirmButton
                             message="Remove this capsule's memory from the public map?"
                             className="inline-block rounded-lg border border-red-300 px-3 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
@@ -384,6 +393,7 @@ export default async function CapsulePage({
                             Share as public memory
                         </Link>
                     )}
+                    {isOwner && (
                         <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
                             <p className="text-sm text-amber-800">
                                 {hoursLeft !== null
@@ -401,6 +411,7 @@ export default async function CapsulePage({
                                 </button>
                             </form>
                         </div>
+                    )}
                     )
 
                     {!isOwner && canContribute && windowOpen &&(

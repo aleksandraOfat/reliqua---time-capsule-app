@@ -107,6 +107,14 @@ export async function inviteMember(formData: FormData) {
         invitee_role: role,
     })
 
+    if (status === 'ok') {
+        await supabase.rpc('log_audit', {
+            p_action: 'invite_member',
+            p_entity_type: 'capsule',
+            p_entity_id: capsuleId,
+        })
+    }
+
     revalidatePath(`/capsules/${capsuleId}`)
     redirect(`/capsules/${capsuleId}?invite=${error ? 'error' : status}`)
 }
@@ -124,6 +132,11 @@ export async function removeMember(formData: FormData) {
     }
 
     await supabase.from( 'capsule_members').delete().eq('id', memberId)
+    await supabase.rpc('log_audit', {
+        p_action: 'remove_member',
+        p_entity_type: 'capsule',
+        p_entity_id: capsuleId,
+    })
 
     revalidatePath(`/capsules/${capsuleId}`)
     redirect(`/capsules/${capsuleId}`)
@@ -499,6 +512,11 @@ export async function respondToInvitation(formData: FormData) {
         member_row_id: memberId,
         accept,
     })
+    await supabase.rpc('log_audit', {
+        p_action: accept ? 'accept_invite' : 'decline_invite',
+        p_entity_type: 'capsule_member',
+        p_entity_id: memberId,
+    })
 
     revalidatePath('/invitations')
     revalidatePath('/dashboard')
@@ -514,11 +532,6 @@ export async function respondToInvitation(formData: FormData) {
         }
     }
 
-    await supabase.rpc('log_audit', {
-        p_action: accept ? 'accept_invite' : 'decline_invite',
-        p_entity_type: 'capsule_member',
-        p_entity_id: memberId,
-    })
     redirect('/invitations')
 }
 

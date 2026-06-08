@@ -82,6 +82,7 @@ export default async function DashboardPage({searchParams,}:{
 
     return (
         <div>
+
             <h1 className="text-3xl font-semibold text-slate-900">Hello {name}!</h1>
             <p className="mt-1 text-slate-500">
                 You have {readyCount} {readyCount === 1 ? 'capsule' : 'capsules'} ready to open.
@@ -97,9 +98,9 @@ export default async function DashboardPage({searchParams,}:{
             )}
 
             <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <StatCard label="SEALED" value={sealedCount} caption="capsules" />
-                <StatCard label="READY" value={readyCount} caption="capsules to view" />
-                <StatCard label="GROUP" value={groupCount} caption="shared capsules" />
+                <StatCard label="SEALED" value={sealedCount} caption="capsules"/>
+                <StatCard label="READY" value={readyCount} caption="capsules to view"/>
+                <StatCard label="GROUP" value={groupCount} caption="shared capsules"/>
             </div>
 
             <Link
@@ -155,7 +156,7 @@ export default async function DashboardPage({searchParams,}:{
                                                 ? 'bg-slate-100 text-slate-600'
                                                 : c.state === 'collecting'
                                                     ? 'bg-emerald-100 text-emerald-800'
-                                                    : 'bg-purple-100 text-purple-700' 
+                                                    : 'bg-purple-100 text-purple-700'
                                     }`}
                                 >
                 {c.state === 'ready'
@@ -171,7 +172,8 @@ export default async function DashboardPage({searchParams,}:{
                 </ul>
             )}
             {shared === '1' && (
-                <div className="fixed bottom-6 right-6 rounded-xl bg-emerald-700 px-4 py-3 text-sm font-medium text-white shadow-lg">
+                <div
+                    className="fixed bottom-6 right-6 rounded-xl bg-emerald-700 px-4 py-3 text-sm font-medium text-white shadow-lg">
                     Your memory has been shared on the map.
                 </div>
             )}
@@ -179,7 +181,7 @@ export default async function DashboardPage({searchParams,}:{
     )
 }
 
-function StatCard({label, value, caption,}:{
+function StatCard({label, value, caption,}: {
     label: string
     value:number
     caption: string
