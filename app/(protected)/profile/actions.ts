@@ -13,6 +13,12 @@ export async function updateProfile(
 ): Promise<ProfileState> {
     const fullName = (formData.get('full_name') as string)?.trim()
     const username = (formData.get('username') as string)?.trim()
+    if (username && /\s/.test(username)) {
+        return { error: 'Username cannot contain spaces.' }
+    }
+    if (username && !/^[a-zA-Z0-9_-]+$/.test(username)) {
+        return { error: 'Username can only contain letters, numbers, hyphens and underscores.' }
+    }
 
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()

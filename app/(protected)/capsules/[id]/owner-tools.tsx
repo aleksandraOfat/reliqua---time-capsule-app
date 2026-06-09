@@ -1,14 +1,17 @@
 import { inviteMember, removeMember, deleteCapsule } from '../actions'
 import ConfirmButton from '@/components/confirm-button'
+import DeleteConfirm from '@/components/delete-confirm'
 
 type Member = { member_id: string; email: string; member_role: string }
 
 export default function OwnerTools({
                                        id,
+                                       title,
                                        members,
                                        inviteResult,
                                    }: {
     id: string
+    title: string
     members: Member[]
     inviteResult: { text: string; ok: boolean } | null
 }) {
@@ -68,15 +71,23 @@ export default function OwnerTools({
                 <p className="mv-sans mt-1 text-sm text-red-700">
                 Deleting this capsule permanently removes all its messages and files. This cannot be undone.
                 </p>
-                <form action={deleteCapsule} className="mt-4">
-                    <input type="hidden" name="capsule_id" value={id} />
-                    <ConfirmButton
-                        message="Delete this capsule permanently? This cannot be undone."
-                        className="mv-sans inline-flex items-center justify-center whitespace-nowrap rounded-lg bg-red-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
-                    >
-                        Delete capsule
-                    </ConfirmButton>
-                </form>
+                <DeleteConfirm
+                    triggerLabel="Delete capsule"
+                    title="Delete this capsule?"
+                    description="This permanently removes the capsule and all its messages and files. This action is irreversible."
+                    confirmValue={title}
+                    confirmLabel="Delete capsule"
+                >
+                    <form action={deleteCapsule}>
+                        <input type="hidden" name="capsule_id" value={id} />
+                        <button
+                            type="submit"
+                            className="mv-sans rounded-lg bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
+                        >
+                            Delete capsule
+                        </button>
+                    </form>
+                </DeleteConfirm>
             </div>
         </>
     )

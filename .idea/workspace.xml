@@ -4,8 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="71420f7f-d901-4af8-8d76-23acf01a2039" name="Changes" comment="frontend improvements">
+    <list default="true" id="71420f7f-d901-4af8-8d76-23acf01a2039" name="Changes" comment="Cron daily for Vercel">
+      <change afterPath="$PROJECT_DIR$/components/delete-confirm.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(protected)/capsules/[id]/owner-tools.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/capsules/[id]/owner-tools.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(protected)/capsules/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/capsules/[id]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(protected)/profile/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/profile/actions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(protected)/profile/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/profile/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(protected)/profile/profile-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/profile/profile-form.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -99,7 +105,7 @@
       <workItem from="1780581224253" duration="9893000" />
       <workItem from="1780642542566" duration="15435000" />
       <workItem from="1780900450741" duration="31145000" />
-      <workItem from="1780989709001" duration="2427000" />
+      <workItem from="1780989709001" duration="3841000" />
     </task>
     <task id="LOCAL-00001" summary="added login and create basic capsule">
       <option name="closed" value="true" />
@@ -149,7 +155,15 @@
       <option name="project" value="LOCAL" />
       <updated>1780958170006</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Cron daily for Vercel">
+      <option name="closed" value="true" />
+      <created>1780992329190</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1780992329190</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -161,6 +175,7 @@
     <MESSAGE value="small adjustments" />
     <MESSAGE value="frontend dev" />
     <MESSAGE value="frontend improvements" />
-    <option name="LAST_COMMIT_MESSAGE" value="frontend improvements" />
+    <MESSAGE value="Cron daily for Vercel" />
+    <option name="LAST_COMMIT_MESSAGE" value="Cron daily for Vercel" />
   </component>
 </project>

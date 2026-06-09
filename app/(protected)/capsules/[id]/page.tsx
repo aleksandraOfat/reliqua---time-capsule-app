@@ -262,7 +262,7 @@ export default async function CapsulePage({
             {!isOpened && !isReady && !isCollecting && <SealedView daysLeft={daysLeft} />}
 
             {isOwner && (
-                <OwnerTools id={id} members={members} inviteResult={inviteResult} />
+                <OwnerTools id={id} title={capsule.title} members={members} inviteResult={inviteResult} />
             )}
 
         </div>

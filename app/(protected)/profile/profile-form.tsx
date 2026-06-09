@@ -58,7 +58,14 @@ export default function ProfileForm({
                         <label htmlFor="username" className="mv-sans text-sm font-medium text-mv-ink">
                             Username
                         </label>
-                        <input id="username" name="username" defaultValue={username} className={inputCls}/>
+                        <input
+                            id="username"
+                            name="username"
+                            defaultValue={username}
+                            pattern="[A-Za-z0-9_-]+"
+                            title="Letters, numbers, hyphens and underscores only — no spaces."
+                            className={inputCls}
+                        />
                         <span className="mv-sans text-xs text-mv-muted">
                             Shown next to your messages and in shared capsules.
                         </span>
