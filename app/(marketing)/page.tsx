@@ -9,7 +9,7 @@ export default function StartPage() {
                 <h1 className="mv-title">
                     Preserve memories
                     <br />
-                    for the future
+                     for the future
                 </h1>
                 <p className="mv-description">
                     Create time capsules with photos and messages, then unseal them months

@@ -235,8 +235,15 @@
     .mv-button { flex: 1; }
     .mv-hero { margin-top: 48px; }
     .mv-kicker { font-size: 18px; }
-    .mv-title { font-size: 42px; }
+    .mv-title { font-size: 32px; line-height: 1.15; }
     .mv-description { font-size: 16px; }
     .mv-cta { font-size: 26px; }
     .mv-footer-inner { flex-direction: column; align-items: flex-start; gap: 12px; }
+
+    .mv-cards { gap: 16px; margin-top: 40px; }
+    .mv-card { min-height: 0; padding: 24px 22px; }
+    .mv-card-number { margin-bottom: 16px; }
+    .mv-icon-box { width: 52px; height: 52px; margin-bottom: 16px; }
+    .mv-step-icon { width: 30px; height: 30px; }
+    .mv-card h2 { margin-bottom: 8px; font-size: 22px; }
 }

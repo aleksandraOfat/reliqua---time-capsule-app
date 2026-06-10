@@ -46,16 +46,17 @@ export default async function ProtectedLayout({
     return (
         <div className="min-h-screen bg-mv-sand">
             <header className="sticky top-0 z-50 bg-mv-green shadow-sm">
-                <div className="flex h-16 items-center justify-between px-16">
-                    <div className="flex items-center gap-3">
+                <div className="flex h-16 items-center justify-between px-4 sm:px-8 lg:px-16">
+                    <div className="flex min-w-0 items-center gap-2 sm:gap-3">
                         <BackLink/>
-                        <Link href="/dashboard" className="flex items-center gap-3">
-                            <Logo className="h-9 w-9"/>
-                            <span className="mv-heading text-2xl text-white">Reliqua</span>
+                        <Link href="/dashboard" className="flex min-w-0 items-center gap-2">
+                            <Logo className="h-8 w-8 shrink-0 sm:h-9 sm:w-9"/>
+                            <span
+                                className="mv-heading hidden truncate text-xl text-white sm:inline sm:text-2xl">Reliqua</span>
                         </Link>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex shrink-0 items-center gap-2 sm:gap-3">
                         {isAdmin && (
                             <Link
                                 href="/admin/users"
@@ -97,10 +98,10 @@ export default async function ProtectedLayout({
     )
 }
 
-function Logo({ className }: { className?: string }) {
+function Logo({className}: { className?: string }) {
     return (
         <svg className={className} viewBox="0 0 64 64" aria-hidden="true">
-            <rect x="6" y="8" width="52" height="38" fill="#e8c4d4" stroke="#1f1f1f" strokeWidth="2" />
+            <rect x="6" y="8" width="52" height="38" fill="#e8c4d4" stroke="#1f1f1f" strokeWidth="2"/>
             <path d="M7 9l25 23L57 9" fill="none" stroke="#1f1f1f" strokeWidth="2" />
             <path d="M7 46l19-18" fill="none" stroke="#1f1f1f" strokeWidth="2" />
             <path d="M57 46L38 28" fill="none" stroke="#1f1f1f" strokeWidth="2" />

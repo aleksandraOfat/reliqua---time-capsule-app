@@ -193,14 +193,19 @@ function StatCard({
     caption: string
 }) {
     return (
-        <div className="rounded-2xl border border-mv-border bg-mv-card p-6 shadow-sm">
-            <p className="mv-serif text-sm font-semibold uppercase tracking-wide text-mv-clay">
-                {label}
-            </p>
-            <p className="mv-serif mt-2 text-5xl font-semibold leading-none text-mv-ink">
+        <div className="flex items-center justify-between gap-3 rounded-2xl border border-mv-border bg-mv-card p-4 shadow-sm sm:block sm:p-6">
+            <div>
+                <p className="mv-serif text-xs font-semibold uppercase tracking-wide text-mv-clay sm:text-sm">
+                    {label}
+                </p>
+                <p className="mv-serif hidden text-mv-ink sm:mt-2 sm:block sm:text-5xl sm:font-semibold sm:leading-none">
+                    {value}
+                </p>
+                <p className="mv-sans mt-0.5 text-sm font-light text-mv-muted sm:mt-3 sm:text-base">{caption}</p>
+            </div>
+            <p className="mv-serif text-4xl font-semibold leading-none text-mv-ink sm:hidden">
                 {value}
             </p>
-            <p className="mv-sans mt-3 text-sm font-light text-mv-muted">{caption}</p>
         </div>
     )
 }
