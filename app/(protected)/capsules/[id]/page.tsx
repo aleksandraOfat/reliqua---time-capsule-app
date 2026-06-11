@@ -9,6 +9,7 @@ import CapsuleHeader from '@/components/capsule-header'
 import CollectingPanel from './collecting-panel'
 import { OpenedView, ReadyView, SealedView, ReadyNotOwner } from './capsule-states'
 import OwnerTools from './owner-tools'
+import { deriveCapsuleState } from '@/lib/capsule-state'
 
 
 export default async function CapsulePage({
@@ -59,6 +60,7 @@ export default async function CapsulePage({
     const hoursLeft = sealDeadline ? Math.max(0, Math.ceil((sealDeadline - now) / 3_600_000)) : null
     const lifecycleState: 'collecting' | 'sealed' | 'ready' | 'opened' =
         isOpened ? 'opened' : isCollecting ? 'collecting' : isReady ? 'ready' : 'sealed'
+    //const lifecycleState = deriveCapsuleState({ status: capsule.status, openDateMs: openMs, now })
 
     const createdMsCap = new Date(capsule.created_at).getTime()
     const pct = (from: number, to: number) =>

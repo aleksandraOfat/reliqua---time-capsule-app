@@ -34,7 +34,7 @@ export function decrypt(payload: string): string {
     const key = getKey()
     const [ivHex, authTagHex, encryptedHex] = payload.split(':')
 
-    if (!ivHex || !authTagHex || !encryptedHex) {
+    if (!ivHex || !authTagHex || encryptedHex === undefined) {
         throw new Error('Invalid encrypted payload format.')
     }
 

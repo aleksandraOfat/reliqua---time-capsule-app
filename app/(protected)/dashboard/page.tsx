@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { deriveCapsuleState } from '@/lib/capsule-state'
 
 export default async function DashboardPage({
                                                 searchParams,
@@ -59,6 +60,7 @@ export default async function DashboardPage({
         else if (c.status === 'collecting') state = 'collecting'
         else if (openMs !== null && openMs <= now) state = 'ready'
         else state = 'sealed'
+        //const state = deriveCapsuleState({ status: c.status, openDateMs: openMs, now })
 
         const daysLeft =
             openMs !== null ? Math.ceil((openMs - now) / 86_400_000) : null

@@ -4,12 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="71420f7f-d901-4af8-8d76-23acf01a2039" name="Changes" comment="small improvements">
+    <list default="true" id="71420f7f-d901-4af8-8d76-23acf01a2039" name="Changes" comment="Improve mobile UI">
+      <change afterPath="$PROJECT_DIR$/lib/capsule-state.test.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/capsule-state.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/crypto.test.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vitest.config.mts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vitest.setup.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(marketing)/landing.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/(marketing)/landing.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(marketing)/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(marketing)/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(protected)/dashboard/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/dashboard/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(protected)/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/crypto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/crypto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,8 +24,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="CSS File" />
-        <option value="TypeScript File" />
         <option value="TypeScript JSX File" />
+        <option value="TypeScript File" />
       </list>
     </option>
   </component>
@@ -104,7 +108,8 @@
       <workItem from="1780642542566" duration="15435000" />
       <workItem from="1780900450741" duration="31145000" />
       <workItem from="1780989709001" duration="4907000" />
-      <workItem from="1781091608554" duration="1623000" />
+      <workItem from="1781091608554" duration="4196000" />
+      <workItem from="1781219868173" duration="1338000" />
     </task>
     <task id="LOCAL-00001" summary="added login and create basic capsule">
       <option name="closed" value="true" />
@@ -170,7 +175,15 @@
       <option name="project" value="LOCAL" />
       <updated>1780993671512</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Improve mobile UI">
+      <option name="closed" value="true" />
+      <created>1781093315209</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1781093315209</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -184,6 +197,7 @@
     <MESSAGE value="frontend improvements" />
     <MESSAGE value="Cron daily for Vercel" />
     <MESSAGE value="small improvements" />
-    <option name="LAST_COMMIT_MESSAGE" value="small improvements" />
+    <MESSAGE value="Improve mobile UI" />
+    <option name="LAST_COMMIT_MESSAGE" value="Improve mobile UI" />
   </component>
 </project>
