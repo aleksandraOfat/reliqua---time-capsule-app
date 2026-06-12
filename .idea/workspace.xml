@@ -4,16 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="71420f7f-d901-4af8-8d76-23acf01a2039" name="Changes" comment="Improve mobile UI">
-      <change afterPath="$PROJECT_DIR$/lib/capsule-state.test.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/capsule-state.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/crypto.test.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/vitest.config.mts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/vitest.setup.ts" afterDir="false" />
+    <list default="true" id="71420f7f-d901-4af8-8d76-23acf01a2039" name="Changes" comment="added tests">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/crypto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/crypto.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,7 +101,8 @@
       <workItem from="1780900450741" duration="31145000" />
       <workItem from="1780989709001" duration="4907000" />
       <workItem from="1781091608554" duration="4196000" />
-      <workItem from="1781219868173" duration="1338000" />
+      <workItem from="1781219868173" duration="2126000" />
+      <workItem from="1781244616318" duration="1205000" />
     </task>
     <task id="LOCAL-00001" summary="added login and create basic capsule">
       <option name="closed" value="true" />
@@ -183,7 +176,15 @@
       <option name="project" value="LOCAL" />
       <updated>1781093315209</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="added tests">
+      <option name="closed" value="true" />
+      <created>1781221986645</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1781221986645</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -198,6 +199,7 @@
     <MESSAGE value="Cron daily for Vercel" />
     <MESSAGE value="small improvements" />
     <MESSAGE value="Improve mobile UI" />
-    <option name="LAST_COMMIT_MESSAGE" value="Improve mobile UI" />
+    <MESSAGE value="added tests" />
+    <option name="LAST_COMMIT_MESSAGE" value="added tests" />
   </component>
 </project>

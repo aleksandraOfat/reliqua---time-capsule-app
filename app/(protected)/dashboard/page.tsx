@@ -40,7 +40,7 @@ export default async function DashboardPage({
     )
 
     const visibleList = (capsules ?? []).filter(
-        (c: any) => c.owner_id === user!.id || c.is_public || acceptedSet.has(c.id)
+        (c: any) => c.owner_id === user!.id || acceptedSet.has(c.id)
     )
     const now = Date.now()
 
