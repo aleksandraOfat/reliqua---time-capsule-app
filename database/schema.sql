@@ -13,6 +13,7 @@ SET row_security = off;
 
 CREATE SCHEMA public;
 
+
 COMMENT ON SCHEMA public IS 'standard public schema';
 
 
@@ -65,6 +66,7 @@ CREATE FUNCTION public.admin_audit_actions() RETURNS TABLE(action text)
 $$;
 
 
+
 CREATE FUNCTION public.admin_audit_log(p_action text DEFAULT NULL::text, p_actor text DEFAULT NULL::text, p_date_from timestamp with time zone DEFAULT NULL::timestamp with time zone, p_date_to timestamp with time zone DEFAULT NULL::timestamp with time zone) RETURNS TABLE(id uuid, action text, entity_type text, entity_id uuid, actor_email text, created_at timestamp with time zone)
     LANGUAGE plpgsql SECURITY DEFINER
     SET search_path TO 'public'
@@ -99,17 +101,20 @@ end;
 $$;
 
 
+
 CREATE FUNCTION public.admin_set_active(target_id uuid, active boolean) RETURNS text
     LANGUAGE plpgsql SECURITY DEFINER
     SET search_path TO 'public'
     AS $$
 begin
   if not public.is_admin() then return 'forbidden'; end if;
-  if target_id = auth.uid() then return 'self'; end if;  -- admin nie blokuje sam siebie
+  if target_id = auth.uid() then return 'self'; end if;
   update profiles set is_active = active where id = target_id;
   return 'ok';
 end;
 $$;
+
+
 
 
 CREATE FUNCTION public.can_access_capsule(cap_id uuid) RETURNS boolean
@@ -119,6 +124,18 @@ CREATE FUNCTION public.can_access_capsule(cap_id uuid) RETURNS boolean
   select public.is_capsule_owner(cap_id) or public.is_capsule_member(cap_id);
 $$;
 
+
+
+CREATE FUNCTION public.capsules_update_search_vector() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+begin
+    new.search_vector :=
+        setweight(to_tsvector('simple', coalesce(new.title, '')), 'A') ||
+        setweight(to_tsvector('simple', coalesce(new.description, '')), 'B');
+    return new;
+end;
+$$;
 
 
 CREATE FUNCTION public.delete_my_account() RETURNS void
@@ -131,6 +148,7 @@ begin
   delete from auth.users where id = auth.uid();
 end;
 $$;
+
 
 
 CREATE FUNCTION public.get_capsule_contents_with_authors(cap_id uuid) RETURNS TABLE(content_id uuid, encrypted_message text, author_id uuid, author_name text, created_at timestamp with time zone)
@@ -157,6 +175,7 @@ end;
 $$;
 
 
+
 CREATE FUNCTION public.get_capsule_members(cap_id uuid) RETURNS TABLE(member_id uuid, user_id uuid, email text, member_role public.member_role, invited_at timestamp with time zone)
     LANGUAGE plpgsql SECURITY DEFINER
     SET search_path TO 'public'
@@ -174,6 +193,7 @@ begin
     order by m.invited_at;
 end;
 $$;
+
 
 
 CREATE FUNCTION public.get_my_invitations() RETURNS TABLE(member_id uuid, capsule_id uuid, capsule_title text, owner_name text, owner_email text, open_date timestamp with time zone, status public.member_status)
@@ -196,6 +216,8 @@ CREATE FUNCTION public.get_my_invitations() RETURNS TABLE(member_id uuid, capsul
     and m.status = 'pending';
 $$;
 
+
+
 CREATE FUNCTION public.handle_new_user() RETURNS trigger
     LANGUAGE plpgsql SECURITY DEFINER
     SET search_path TO 'public'
@@ -211,6 +233,7 @@ begin
   return new;
 end;
 $$;
+
 
 
 CREATE FUNCTION public.invite_member(cap_id uuid, invitee_email text, invitee_role public.member_role) RETURNS text
@@ -255,7 +278,6 @@ CREATE FUNCTION public.is_accepted_member(cap_id uuid) RETURNS boolean
     where capsule_id = cap_id and user_id = auth.uid() and status = 'accepted'
   );
 $$;
-
 
 CREATE FUNCTION public.is_admin() RETURNS boolean
     LANGUAGE sql SECURITY DEFINER
@@ -312,7 +334,6 @@ CREATE FUNCTION public.is_collecting(cap_id uuid) RETURNS boolean
 $$;
 
 
-
 CREATE FUNCTION public.log_audit(p_action text, p_entity_type text, p_entity_id uuid) RETURNS void
     LANGUAGE sql SECURITY DEFINER
     SET search_path TO 'public'
@@ -320,7 +341,6 @@ CREATE FUNCTION public.log_audit(p_action text, p_entity_type text, p_entity_id 
   insert into audit_log (user_id, action, entity_type, entity_id)
   values (auth.uid(), p_action, p_entity_type, p_entity_id);
 $$;
-
 
 
 CREATE FUNCTION public.mark_notifications_read() RETURNS void
@@ -332,8 +352,6 @@ CREATE FUNCTION public.mark_notifications_read() RETURNS void
 $$;
 
 
-
-
 CREATE FUNCTION public.mark_one_notification_read(notif_id uuid) RETURNS void
     LANGUAGE sql SECURITY DEFINER
     SET search_path TO 'public'
@@ -341,6 +359,22 @@ CREATE FUNCTION public.mark_one_notification_read(notif_id uuid) RETURNS void
   update notifications set is_read = true
   where id = notif_id and user_id = auth.uid();
 $$;
+
+
+
+CREATE FUNCTION public.my_tag_counts() RETURNS TABLE(name text, capsule_count bigint)
+    LANGUAGE sql SECURITY DEFINER
+    SET search_path TO 'public'
+    AS $$
+    select t.name, count(*) as capsule_count
+    from capsule_tags ct
+    join tags t      on t.id = ct.tag_id
+    join capsules c  on c.id = ct.capsule_id
+    where c.owner_id = auth.uid() or public.is_capsule_member(c.id)
+    group by t.name
+    order by capsule_count desc, t.name;
+$$;
+
 
 CREATE FUNCTION public.notify_capsule_members(cap_id uuid, p_type public.notification_type, p_exclude uuid DEFAULT NULL::uuid) RETURNS void
     LANGUAGE plpgsql SECURITY DEFINER
@@ -371,7 +405,6 @@ CREATE FUNCTION public.process_capsule_lifecycle() RETURNS void
     SET search_path TO 'public'
     AS $$
 begin
-
   update capsules
   set status = 'sealed', sealed_at = now()
   where status = 'collecting'
@@ -453,6 +486,43 @@ BEGIN
 END;
 $$;
 
+CREATE FUNCTION public.search_my_capsules(q text) RETURNS TABLE(id uuid, title text, status public.capsule_status)
+    LANGUAGE sql SECURITY DEFINER
+    SET search_path TO 'public'
+    AS $$
+    select distinct c.id, c.title, c.status
+    from capsules c
+    left join capsule_tags ct on ct.capsule_id = c.id
+    left join tags t on t.id = ct.tag_id
+    where (c.owner_id = auth.uid() or public.is_capsule_member(c.id))
+      and (
+            c.search_vector @@ websearch_to_tsquery('simple', q)
+         or t.name ilike '%' || q || '%'
+      )
+    order by c.title;
+$$;
+
+
+CREATE FUNCTION public.search_my_capsules_by_tags(tag_names text[]) RETURNS TABLE(id uuid, title text, status public.capsule_status)
+    LANGUAGE sql SECURITY DEFINER
+    SET search_path TO 'public'
+    AS $$
+    select c.id, c.title, c.status
+    from capsules c
+    join capsule_tags ct on ct.capsule_id = c.id
+    join tags t          on t.id = ct.tag_id
+    where (c.owner_id = auth.uid() or public.is_capsule_member(c.id))
+      and lower(t.name) = any (
+            select lower(x) from unnest(tag_names) as x
+      )
+    group by c.id, c.title, c.status
+    having count(distinct lower(t.name)) = (
+        select count(distinct lower(x)) from unnest(tag_names) as x
+    )
+    order by c.title;
+$$;
+
+
 CREATE FUNCTION public.user_exists_by_email(check_email text) RETURNS boolean
     LANGUAGE sql SECURITY DEFINER
     SET search_path TO 'public'
@@ -477,6 +547,7 @@ CREATE TABLE public.audit_log (
     created_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
+
 CREATE TABLE public.capsule_contents (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     capsule_id uuid NOT NULL,
@@ -495,7 +566,6 @@ CREATE TABLE public.capsule_files (
     author_id uuid
 );
 
-
 CREATE TABLE public.capsule_members (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     capsule_id uuid NOT NULL,
@@ -504,6 +574,12 @@ CREATE TABLE public.capsule_members (
     invited_at timestamp with time zone DEFAULT now() NOT NULL,
     status public.member_status DEFAULT 'pending'::public.member_status NOT NULL,
     contribution_done boolean DEFAULT false NOT NULL
+);
+
+
+CREATE TABLE public.capsule_tags (
+    capsule_id uuid NOT NULL,
+    tag_id uuid NOT NULL
 );
 
 
@@ -517,7 +593,8 @@ CREATE TABLE public.capsules (
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     sealed_at timestamp with time zone,
     description text,
-    seal_deadline timestamp with time zone
+    seal_deadline timestamp with time zone,
+    search_vector tsvector
 );
 
 
@@ -532,12 +609,13 @@ CREATE TABLE public.notifications (
 );
 
 
-
 CREATE TABLE public.open_conditions (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     capsule_id uuid NOT NULL,
     open_date timestamp with time zone
 );
+
+
 
 CREATE TABLE public.open_history (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -546,7 +624,6 @@ CREATE TABLE public.open_history (
     opened_at timestamp with time zone DEFAULT now() NOT NULL,
     conditions_met text
 );
-
 
 
 CREATE TABLE public.profiles (
@@ -566,6 +643,7 @@ CREATE TABLE public.profiles (
 );
 
 
+
 CREATE TABLE public.public_memories (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     capsule_id uuid NOT NULL,
@@ -579,9 +657,16 @@ CREATE TABLE public.public_memories (
     cover_url text
 );
 
+
+
+CREATE TABLE public.tags (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    name text NOT NULL
+);
+
+
 ALTER TABLE ONLY public.audit_log
     ADD CONSTRAINT audit_log_pkey PRIMARY KEY (id);
-
 
 ALTER TABLE ONLY public.capsule_contents
     ADD CONSTRAINT capsule_contents_pkey PRIMARY KEY (id);
@@ -597,6 +682,10 @@ ALTER TABLE ONLY public.capsule_members
 
 ALTER TABLE ONLY public.capsule_members
     ADD CONSTRAINT capsule_members_pkey PRIMARY KEY (id);
+
+
+ALTER TABLE ONLY public.capsule_tags
+    ADD CONSTRAINT capsule_tags_pkey PRIMARY KEY (capsule_id, tag_id);
 
 
 ALTER TABLE ONLY public.capsules
@@ -624,11 +713,21 @@ ALTER TABLE ONLY public.profiles
 ALTER TABLE ONLY public.profiles
     ADD CONSTRAINT profiles_username_key UNIQUE (username);
 
+
 ALTER TABLE ONLY public.public_memories
     ADD CONSTRAINT public_memories_capsule_unique UNIQUE (capsule_id);
 
 ALTER TABLE ONLY public.public_memories
     ADD CONSTRAINT public_memories_pkey PRIMARY KEY (id);
+
+
+ALTER TABLE ONLY public.tags
+    ADD CONSTRAINT tags_name_key UNIQUE (name);
+
+ALTER TABLE ONLY public.tags
+    ADD CONSTRAINT tags_pkey PRIMARY KEY (id);
+
+CREATE INDEX capsules_search_idx ON public.capsules USING gin (search_vector);
 
 CREATE INDEX idx_capsules_owner ON public.capsules USING btree (owner_id);
 
@@ -644,14 +743,18 @@ CREATE INDEX idx_members_user ON public.capsule_members USING btree (user_id);
 
 CREATE INDEX idx_memories_date ON public.public_memories USING btree (memory_date);
 
+
 CREATE INDEX idx_notifications_user ON public.notifications USING btree (user_id);
+
+
+CREATE TRIGGER capsules_search_vector_trg BEFORE INSERT OR UPDATE OF title, description ON public.capsules FOR EACH ROW EXECUTE FUNCTION public.capsules_update_search_vector();
 
 ALTER TABLE ONLY public.audit_log
     ADD CONSTRAINT audit_log_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id) ON DELETE SET NULL;
 
+
 ALTER TABLE ONLY public.capsule_contents
     ADD CONSTRAINT capsule_contents_author_id_fkey FOREIGN KEY (author_id) REFERENCES public.profiles(id) ON DELETE SET NULL;
-
 
 ALTER TABLE ONLY public.capsule_contents
     ADD CONSTRAINT capsule_contents_capsule_id_fkey FOREIGN KEY (capsule_id) REFERENCES public.capsules(id) ON DELETE CASCADE;
@@ -663,20 +766,33 @@ ALTER TABLE ONLY public.capsule_files
 ALTER TABLE ONLY public.capsule_files
     ADD CONSTRAINT capsule_files_capsule_id_fkey FOREIGN KEY (capsule_id) REFERENCES public.capsules(id) ON DELETE CASCADE;
 
+
 ALTER TABLE ONLY public.capsule_members
     ADD CONSTRAINT capsule_members_capsule_id_fkey FOREIGN KEY (capsule_id) REFERENCES public.capsules(id) ON DELETE CASCADE;
+
 
 ALTER TABLE ONLY public.capsule_members
     ADD CONSTRAINT capsule_members_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY public.capsule_tags
+    ADD CONSTRAINT capsule_tags_capsule_id_fkey FOREIGN KEY (capsule_id) REFERENCES public.capsules(id) ON DELETE CASCADE;
+
+
+ALTER TABLE ONLY public.capsule_tags
+    ADD CONSTRAINT capsule_tags_tag_id_fkey FOREIGN KEY (tag_id) REFERENCES public.tags(id) ON DELETE CASCADE;
+
+
 ALTER TABLE ONLY public.capsules
     ADD CONSTRAINT capsules_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id) ON DELETE CASCADE;
+
 
 ALTER TABLE ONLY public.notifications
     ADD CONSTRAINT notifications_capsule_id_fkey FOREIGN KEY (capsule_id) REFERENCES public.capsules(id) ON DELETE CASCADE;
 
+
 ALTER TABLE ONLY public.notifications
     ADD CONSTRAINT notifications_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id) ON DELETE CASCADE;
+
 
 ALTER TABLE ONLY public.open_conditions
     ADD CONSTRAINT open_conditions_capsule_id_fkey FOREIGN KEY (capsule_id) REFERENCES public.capsules(id) ON DELETE CASCADE;
@@ -687,14 +803,18 @@ ALTER TABLE ONLY public.open_history
 ALTER TABLE ONLY public.open_history
     ADD CONSTRAINT open_history_opened_by_fkey FOREIGN KEY (opened_by) REFERENCES public.profiles(id) ON DELETE CASCADE;
 
+
 ALTER TABLE ONLY public.profiles
     ADD CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE;
+
 
 ALTER TABLE ONLY public.public_memories
     ADD CONSTRAINT public_memories_capsule_id_fkey FOREIGN KEY (capsule_id) REFERENCES public.capsules(id) ON DELETE CASCADE;
 
+
 ALTER TABLE ONLY public.public_memories
     ADD CONSTRAINT public_memories_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id) ON DELETE CASCADE;
+
 
 ALTER TABLE public.audit_log ENABLE ROW LEVEL SECURITY;
 
@@ -711,6 +831,12 @@ CREATE POLICY capsule_insert ON public.capsules FOR INSERT WITH CHECK ((owner_id
 ALTER TABLE public.capsule_members ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY capsule_select ON public.capsules FOR SELECT USING (((owner_id = auth.uid()) OR public.is_capsule_member(id) OR is_public));
+
+ALTER TABLE public.capsule_tags ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY capsule_tags_select ON public.capsule_tags FOR SELECT USING (public.can_access_capsule(capsule_id));
+
+CREATE POLICY capsule_tags_write ON public.capsule_tags USING ((public.is_capsule_owner(capsule_id) OR public.is_capsule_editor(capsule_id))) WITH CHECK ((public.is_capsule_owner(capsule_id) OR public.is_capsule_editor(capsule_id)));
 
 CREATE POLICY capsule_update ON public.capsules FOR UPDATE USING (((owner_id = auth.uid()) OR public.is_capsule_editor(id))) WITH CHECK (((owner_id = auth.uid()) OR public.is_capsule_editor(id)));
 
@@ -769,4 +895,11 @@ CREATE POLICY profile_update_own ON public.profiles FOR UPDATE USING ((id = auth
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE public.public_memories ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public.tags ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY tags_insert ON public.tags FOR INSERT WITH CHECK ((auth.uid() IS NOT NULL));
+
+CREATE POLICY tags_select ON public.tags FOR SELECT USING (true);
+
 

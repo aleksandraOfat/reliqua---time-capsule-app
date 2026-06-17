@@ -1,6 +1,7 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { deriveCapsuleState } from '@/lib/capsule-state'
+import {deriveCapsuleState } from '@/lib/capsule-state'
 
 export default async function DashboardPage({
                                                 searchParams,
@@ -14,10 +15,14 @@ export default async function DashboardPage({
         data: { user },
     } = await supabase.auth.getUser()
 
+    if (!user) {
+        redirect('/login')
+    }
+
     const { data: profile } = await supabase
         .from('profiles')
         .select('first_name')
-        .eq('id', user!.id)
+        .eq('id', user.id)
         .maybeSingle()
 
     const { data: capsules } = await supabase
@@ -31,7 +36,7 @@ export default async function DashboardPage({
     const { data: myMemberships } = await supabase
         .from('capsule_members')
         .select('capsule_id, status')
-        .eq('user_id', user!.id)
+        .eq('user_id', user.id)
 
     const acceptedSet = new Set(
         (myMemberships ?? [])
@@ -40,7 +45,7 @@ export default async function DashboardPage({
     )
 
     const visibleList = (capsules ?? []).filter(
-        (c: any) => c.owner_id === user!.id || acceptedSet.has(c.id)
+        (c: any) => c.owner_id === user.id || acceptedSet.has(c.id)
     )
     const now = Date.now()
 
@@ -71,7 +76,7 @@ export default async function DashboardPage({
             progress = Math.min(100, Math.max(0, ((now - createdMs) / (openMs - createdMs)) * 100))
         }
 
-        const isGroup = acceptedSet.has(c.id) && c.owner_id !== user!.id
+        const isGroup = acceptedSet.has(c.id) && c.owner_id !== user.id
 
         return { ...c, openDate, state, daysLeft, progress, isGroup }
     })
@@ -81,7 +86,7 @@ export default async function DashboardPage({
     ).length
     const readyCount = decorated.filter((c) => c.state === 'ready').length
     const groupCount = decorated.filter(
-        (c) => acceptedSet.has(c.id) && c.owner_id !== user!.id
+        (c) => acceptedSet.has(c.id) && c.owner_id !== user.id
     ).length
 
     const name = profile?.first_name || user?.email?.split('@')[0] || 'there'

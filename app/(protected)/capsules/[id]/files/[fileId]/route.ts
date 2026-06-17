@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { decryptBuffer } from '@/lib/crypto'
+import { canAccessCapsuleFile } from '@/lib/capsule-access'
 import { NextResponse } from 'next/server'
 
 export async function GET(
@@ -29,7 +30,12 @@ export async function GET(
     if (capsule.status !== 'opened') {
         const { data: isOwnerData } = await supabase.rpc('is_capsule_owner', { cap_id: id })
         const { data: isMemberData } = await supabase.rpc('is_accepted_member',{ cap_id:id })
-        if (!isOwnerData && !isMemberData) {
+        const allowed = canAccessCapsuleFile({
+            status: capsule.status,
+            isOwner: !!isOwnerData,
+            isAcceptedMember: !!isMemberData,
+        })
+        if (!allowed) {
             return new NextResponse('Not allowed yet', { status: 403 })
         }
     }

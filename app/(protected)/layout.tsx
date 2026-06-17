@@ -65,6 +65,12 @@ export default async function ProtectedLayout({
                                 Admin
                             </Link>
                         )}
+                        <Link
+                            href="/search"
+                            className="mv-sans text-sm font-medium text-white/80 transition hover:text-white"
+                        >
+                            Search
+                        </Link>
 
                         <Link
                             href="/notifications"

@@ -14,6 +14,7 @@ export default function NewCapsuleWizard() {
     const [step, setStep] = useState(0)
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
+    const [tags, setTags] = useState('')
     const [localDate, setLocalDate] = useState('')
     const [message, setMessage] = useState('')
     const [files, setFiles] = useState<File[]>([])
@@ -60,6 +61,7 @@ export default function NewCapsuleWizard() {
         const fd = new FormData()
         fd.set('title', title)
         fd.set('description', description)
+        fd.set('tags', tags)
         fd.set('open_date', isoDate)
         fd.set('message', message)
         fd.set('invites', JSON.stringify(invites))
@@ -152,6 +154,17 @@ export default function NewCapsuleWizard() {
                   rows={3}
                   className={inputCls}
               />
+                        </Field>
+                        <Field label="Tags (optional)">
+                            <input
+                                value={tags}
+                                onChange={(e) => setTags(e.target.value)}
+                                className={inputCls}
+                                placeholder="e.g. family, vacation, wedding"
+                            />
+                            <span className="mv-sans text-xs text-mv-muted">
+                                Separate each tag with a comma. Example: family, vacation, wedding
+                            </span>
                         </Field>
                         <Field label="Opening date">
                             <input

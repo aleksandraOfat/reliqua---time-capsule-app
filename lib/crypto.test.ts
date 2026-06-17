@@ -54,7 +54,7 @@ describe('szyfrowanie plików (encryptBuffer/decryptBuffer)', () => {
 
     it('odrzuca zmodyfikowany bufor', () => {
         const enc = encryptBuffer(Buffer.from('zawartość pliku'))
-        enc[enc.length - 1] = enc[enc.length - 1] ^ 0xff // odwracamy bity ostatniego bajtu
+        enc[enc.length - 1] = enc[enc.length - 1] ^ 0xff
         expect(() => decryptBuffer(enc)).toThrow()
     })
 })

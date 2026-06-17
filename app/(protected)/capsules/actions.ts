@@ -5,6 +5,7 @@ import {encrypt, encryptBuffer} from '@/lib/crypto'
 import { revalidatePath } from 'next/cache'
 import {redirect } from 'next/navigation'
 import { createClient} from '@/lib/supabase/server'
+import {normalizeTags } from '@/lib/tags'
 
 export type CapsuleFormState = { error?: string }
 export type WizardState = { error?: string }
@@ -159,6 +160,7 @@ export async function createCapsuleFull(
     const memLng = parseFloat(formData.get('memory_lng') as string)
     const isPublic = visibility === 'public'
     const memCover = formData.get('memory_cover') as File | null
+    const tagsRaw = (formData.get('tags') as string) || ''
 
 
     if (!title) return {error: 'Please enter a capsule name.' }
@@ -281,6 +283,22 @@ export async function createCapsuleFull(
             })
         }
     } catch {
+    }
+    const tags = normalizeTags(tagsRaw)
+    for (const name of tags) {
+        const { data: tagRow } = await supabase
+            .from('tags')
+            .upsert({ name }, { onConflict: 'name' })
+            .select('id')
+            .single()
+        if (tagRow) {
+            await supabase
+                .from('capsule_tags')
+                .upsert(
+                    { capsule_id: capsule.id, tag_id: tagRow.id },
+                    { onConflict: 'capsule_id,tag_id' }
+                )
+        }
     }
 
     revalidatePath('/dashboard')
@@ -746,4 +764,77 @@ export async function deleteMemory(formData: FormData) {
     revalidatePath('/memories')
     if (capsuleId) revalidatePath(`/capsules/${capsuleId}`)
     redirect(returnTo)
+}
+
+export async function updateCapsuleTags(formData: FormData) {
+    const capsuleId = formData.get('capsule_id') as string
+    const tagsRaw = (formData.get('tags') as string) || ''
+
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) redirect('/login')
+
+    const { data: capsule } = await supabase
+        .from('capsules')
+        .select('owner_id, status')
+        .eq('id', capsuleId)
+        .maybeSingle()
+
+    if (!capsule || capsule.owner_id !== user.id) {
+        redirect(`/capsules/${capsuleId}`)
+    }
+
+    if (capsule.status === 'opened') {
+        redirect(`/capsules/${capsuleId}`)
+    }
+
+    const tags = normalizeTags(tagsRaw)
+
+    const tagIds: string[] = []
+    for (const name of tags) {
+
+        const { data: existing } = await supabase
+            .from('tags')
+            .select('id')
+            .eq('name', name)
+            .maybeSingle()
+
+        if (existing) {
+            tagIds.push(existing.id)
+            continue
+        }
+
+        const { data: created, error: createErr } = await supabase
+            .from('tags')
+            .insert({ name })
+            .select('id')
+            .single()
+        console.log('TAG create:', name, 'err:', createErr)
+        if (created) tagIds.push(created.id)
+    }
+    console.log('TAGS resolved tagIds:', tagIds)
+
+    const { error: delErr } = await supabase.from('capsule_tags').delete().eq('capsule_id', capsuleId)
+    console.log('TAGS delete error:', delErr)
+
+    if (tagIds.length > 0) {
+
+        const { error: insErr } = await supabase.from('capsule_tags').upsert(
+            tagIds.map((tag_id) => ({ capsule_id: capsuleId, tag_id })),
+            { onConflict: 'capsule_id,tag_id' }
+        )
+        if (insErr) {
+            redirect(`/capsules/${capsuleId}?tags=error`)
+        }
+        await supabase
+            .from('capsule_tags')
+            .delete()
+            .eq('capsule_id', capsuleId)
+            .not('tag_id', 'in', `(${tagIds.join(',')})`)
+    } else {
+        await supabase.from('capsule_tags').delete().eq('capsule_id', capsuleId)
+    }
+
+    revalidatePath(`/capsules/${capsuleId}`)
+    redirect(`/capsules/${capsuleId}`)
 }

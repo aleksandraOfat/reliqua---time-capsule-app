@@ -3,7 +3,7 @@ import Link from 'next/link'
 import {createClient } from '@/lib/supabase/server'
 //import { openCapsule } from '../actions'
 import {decrypt} from '@/lib/crypto'
-import {openCapsule, inviteMember, removeMember, addContribution,addContributionFile, sealNow, finishContribution, deleteContribution, deleteContributionFile,deleteCapsule,deleteMemory} from '../actions'
+import {openCapsule, inviteMember, removeMember, addContribution,addContributionFile, sealNow, finishContribution, deleteContribution, deleteContributionFile,deleteCapsule,deleteMemory, updateCapsuleTags} from '../actions'
 import ConfirmButton from '@/components/confirm-button'
 import CapsuleHeader from '@/components/capsule-header'
 import CollectingPanel from './collecting-panel'
@@ -48,6 +48,7 @@ export default async function CapsulePage({
 
     const isOwner = capsule.owner_id === user?.id
     const isOpened = capsule.status === 'opened'
+    const canEditTags = isOwner && capsule.status !== 'opened'
     const isReady = openMs !== null && openMs <= now
     const daysLeft =
         openMs !== null ? Math.ceil((openMs - now) / 86_400_000) : null
@@ -202,6 +203,13 @@ export default async function CapsulePage({
         myMemoryId = mem?.id ?? null
     }
 
+    const { data: capsuleTagsRows } = await supabase
+        .from('capsule_tags')
+        .select('tags(name)')
+        .eq('capsule_id', id)
+    const tagNames: string[] = (capsuleTagsRows ?? [])
+        .map((r: any) => r.tags?.name)
+        .filter(Boolean)
 
     return (
         <div className="mx-auto max-w-2xl">
@@ -224,6 +232,50 @@ export default async function CapsulePage({
                     myMemoryId={myMemoryId}
                 />
             </div>
+
+            {(tagNames.length > 0 || canEditTags) && (
+                <div className="mt-3 rounded-2xl border border-mv-border bg-mv-card p-4 shadow-sm">
+                    {tagNames.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                            {tagNames.map((name) => (
+                                <Link
+                                    key={name}
+                                    href={`/search?q=${encodeURIComponent(name)}`}
+                                    className="mv-sans rounded-full bg-[#e7efe9] px-3 py-1 text-xs font-medium text-mv-green transition hover:brightness-95"
+                                >
+                                    #{name}
+                                </Link>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="mv-sans text-sm text-mv-muted">No tags yet.</p>
+                    )}
+
+                    {canEditTags && (
+                        <div className="mt-3">
+                            <form action={updateCapsuleTags} className="flex gap-2">
+                                <input type="hidden" name="capsule_id" value={id} />
+                                <input
+                                    name="tags"
+                                    type="text"
+                                    defaultValue={tagNames.join(', ')}
+                                    placeholder="e.g. family, vacation, wedding"
+                                    className="mv-sans flex-1 rounded-lg border border-mv-border bg-white px-3 py-2 text-sm text-mv-ink outline-none focus:border-mv-green focus:ring-2 focus:ring-mv-green/20"
+                                />
+                                <button
+                                    type="submit"
+                                    className="mv-sans shrink-0 rounded-lg bg-mv-green px-4 py-2 text-sm font-semibold text-white transition hover:bg-mv-green-hover"
+                                >
+                                    Save tags
+                                </button>
+                            </form>
+                            <p className="mv-sans mt-1.5 text-xs text-mv-muted">
+                                Separate tags with commas. Saving replaces the current tags with this list.
+                            </p>
+                        </div>
+                    )}
+                </div>
+            )}
 
             {isOpened && (
                 <OpenedView

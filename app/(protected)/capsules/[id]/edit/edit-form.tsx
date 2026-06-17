@@ -32,11 +32,12 @@ export default function EditMetaForm({
                 Edit capsule details
             </h1>
             <p className="mv-sans mt-2 text-sm text-mv-muted">
-                You can change the name and description. The sealed contents cannot be edited.
+                You can change the name and description even after sealing. The sealed contents (messages and files)
+                cannot be edited.
             </p>
 
             <form action={formAction} className="mt-6 rounded-2xl border border-mv-border bg-mv-card p-6 shadow-sm">
-                <input type="hidden" name="capsule_id" value={capsuleId} />
+                <input type="hidden" name="capsule_id" value={capsuleId}/>
 
                 <div className="flex flex-col gap-1.5">
                     <label htmlFor="title" className="mv-sans text-sm font-medium text-mv-ink">

@@ -1,5 +1,6 @@
 'use server'
 
+import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
@@ -15,29 +16,38 @@ export async function authenticate(
     const password = formData.get('password') as string
 
     if (!email || !password) {
-        return { error: 'Podaj adres e-mail i hasło.' }
+        return { error: 'Please enter your email and password.' }
     }
 
     const supabase = await createClient()
 
     if (intent === 'signup') {
         if (password.length < 6) {
-            return { error: 'Hasło musi mieć co najmniej 6 znaków.' }
+            return { error: 'Password must be at least 6 characters long.' }
         }
 
-        const { error } = await supabase.auth.signUp({ email, password })
+        const headerList = await headers()
+        const origin = headerList.get('origin') ?? `https://${headerList.get('host') ?? ''}`
+
+        const { error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                emailRedirectTo: `${origin}/auth/confirm`,
+            },
+        })
         if (error) {
             return { error: error.message }
         }
 
         return {
-            message: 'Konto utworzone. Sprawdź skrzynkę e-mail, aby potwierdzić adres.',
+            message: 'Account created. Check your inbox to confirm your email address.',
         }
     }
 
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
-        return { error: 'Nieprawidłowy e-mail lub hasło.' }
+        return { error: 'Invalid email or password.' }
     }
 
     revalidatePath('/', 'layout')
