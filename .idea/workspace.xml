@@ -4,22 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="71420f7f-d901-4af8-8d76-23acf01a2039" name="Changes" comment="Fix link redirection">
-      <change afterPath="$PROJECT_DIR$/integration/capsule-rls.test.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/integration/invite-member.test.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/integration/seal-immutability.test.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/validation.test.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/validation.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/vitest.integration.config.mts" afterDir="false" />
+    <list default="true" id="71420f7f-d901-4af8-8d76-23acf01a2039" name="Changes" comment="tests">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(protected)/capsules/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/capsules/[id]/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(protected)/capsules/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/capsules/actions.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(protected)/dashboard/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/dashboard/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(protected)/profile/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/profile/actions.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/login/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/login/actions.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vitest.config.mts" beforeDir="false" afterPath="$PROJECT_DIR$/vitest.config.mts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -121,7 +108,7 @@
       <workItem from="1781721050334" duration="11558000" />
       <workItem from="1781764404533" duration="155000" />
       <workItem from="1781777552233" duration="325000" />
-      <workItem from="1781781359646" duration="6801000" />
+      <workItem from="1781781359646" duration="9967000" />
     </task>
     <task id="LOCAL-00001" summary="added login and create basic capsule">
       <option name="closed" value="true" />
@@ -227,7 +214,15 @@
       <option name="project" value="LOCAL" />
       <updated>1781777828008</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="tests">
+      <option name="closed" value="true" />
+      <created>1781802482178</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1781802482178</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -246,6 +241,7 @@
     <MESSAGE value="small update" />
     <MESSAGE value="added some tests and other small updates" />
     <MESSAGE value="Fix link redirection" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix link redirection" />
+    <MESSAGE value="tests" />
+    <option name="LAST_COMMIT_MESSAGE" value="tests" />
   </component>
 </project>
