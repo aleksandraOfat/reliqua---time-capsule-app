@@ -1,15 +1,27 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import StepCard from './step-card'
+import AuthErrorCatcher from './auth-error-catcher'
 
-export default function StartPage() {
+export default async function StartPage({
+                                            searchParams,
+                                        }: {
+    searchParams: Promise<{ error?: string; error_code?: string }>
+}) {
+    const { error, error_code } = await searchParams
+    if (error || error_code) {
+        redirect('/auth/confirmed?status=invalid')
+    }
+
     return (
         <main className="mv-page-content">
+            <AuthErrorCatcher/>
             <section className="mv-hero">
                 <p className="mv-kicker">A letter to your future</p>
                 <h1 className="mv-title">
                     Preserve memories
-                    <br />
-                     for the future
+                    <br/>
+                    for the future
                 </h1>
                 <p className="mv-description">
                     Create time capsules with photos and messages, then unseal them months
