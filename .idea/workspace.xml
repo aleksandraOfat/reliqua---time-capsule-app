@@ -4,29 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="71420f7f-d901-4af8-8d76-23acf01a2039" name="Changes" comment="small update">
-      <change afterPath="$PROJECT_DIR$/app/(protected)/search/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/auth/confirm/route.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/auth/confirmed/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/capsule-access.test.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/capsule-access.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/tags.test.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/tags.ts" afterDir="false" />
+    <list default="true" id="71420f7f-d901-4af8-8d76-23acf01a2039" name="Changes" comment="added some tests and other small updates">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(protected)/capsules/[id]/edit/edit-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/capsules/[id]/edit/edit-form.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(protected)/capsules/[id]/files/[fileId]/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/capsules/[id]/files/[fileId]/route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(protected)/capsules/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/capsules/[id]/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(protected)/capsules/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/capsules/actions.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(protected)/capsules/new/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/capsules/new/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(protected)/dashboard/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/dashboard/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(protected)/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(protected)/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/login/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/login/actions.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/schema.sql" beforeDir="false" afterPath="$PROJECT_DIR$/database/schema.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/crypto.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/crypto.test.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vitest.config.mts" beforeDir="false" afterPath="$PROJECT_DIR$/vitest.config.mts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -125,7 +104,8 @@
       <workItem from="1781091608554" duration="4196000" />
       <workItem from="1781219868173" duration="2126000" />
       <workItem from="1781244616318" duration="2410000" />
-      <workItem from="1781721050334" duration="11355000" />
+      <workItem from="1781721050334" duration="11558000" />
+      <workItem from="1781764404533" duration="155000" />
     </task>
     <task id="LOCAL-00001" summary="added login and create basic capsule">
       <option name="closed" value="true" />
@@ -215,7 +195,15 @@
       <option name="project" value="LOCAL" />
       <updated>1781252777649</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="added some tests and other small updates">
+      <option name="closed" value="true" />
+      <created>1781735822758</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1781735822758</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -232,6 +220,7 @@
     <MESSAGE value="Improve mobile UI" />
     <MESSAGE value="added tests" />
     <MESSAGE value="small update" />
-    <option name="LAST_COMMIT_MESSAGE" value="small update" />
+    <MESSAGE value="added some tests and other small updates" />
+    <option name="LAST_COMMIT_MESSAGE" value="added some tests and other small updates" />
   </component>
 </project>

@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
     title: {
-        default: "Reliqua — digital time capsules",
+        default: "Reliqua: digital time capsules",
         template: "%s · Reliqua",
     },
     description:
