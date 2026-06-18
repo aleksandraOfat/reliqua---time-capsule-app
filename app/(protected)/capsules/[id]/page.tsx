@@ -59,9 +59,9 @@ export default async function CapsulePage({
     const windowStarted = sealDeadline !== null
     const windowOpen = isCollecting && (sealDeadline === null || sealDeadline > now)
     const hoursLeft = sealDeadline ? Math.max(0, Math.ceil((sealDeadline - now) / 3_600_000)) : null
-    const lifecycleState: 'collecting' | 'sealed' | 'ready' | 'opened' =
-        isOpened ? 'opened' : isCollecting ? 'collecting' : isReady ? 'ready' : 'sealed'
-    //const lifecycleState = deriveCapsuleState({ status: capsule.status, openDateMs: openMs, now })
+    // const lifecycleState: 'collecting' | 'sealed' | 'ready' | 'opened' =
+    //     isOpened ? 'opened' : isCollecting ? 'collecting' : isReady ? 'ready' : 'sealed'
+    const lifecycleState = deriveCapsuleState({ status: capsule.status, openDateMs: openMs, now })
 
     const createdMsCap = new Date(capsule.created_at).getTime()
     const pct = (from: number, to: number) =>

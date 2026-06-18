@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache'
 import {redirect } from 'next/navigation'
 import { createClient} from '@/lib/supabase/server'
 import {normalizeTags } from '@/lib/tags'
+import { validateCapsuleForm, validateRequired, isValidMemoryInput } from '@/lib/validation'
 
 export type CapsuleFormState = { error?: string }
 export type WizardState = { error?: string }
@@ -162,12 +163,8 @@ export async function createCapsuleFull(
     const memCover = formData.get('memory_cover') as File | null
     const tagsRaw = (formData.get('tags') as string) || ''
 
-
-    if (!title) return {error: 'Please enter a capsule name.' }
-    if (!openDate) return { error: 'Please choose an opening date.'}
-    if (new Date(openDate) <= new Date()) {
-        return { error: 'The opening date must be in the future.' }
-    }
+    const formCheck = validateCapsuleForm({ title, openDate }, Date.now())
+    if (!formCheck.ok) return { error: formCheck.error }
 
     const supabase = await createClient()
     const {
@@ -324,7 +321,8 @@ export async function updateCapsuleMeta(
     const title = (formData.get('title') as string)?.trim()
     const description = (formData.get('description') as string)?.trim()
 
-    if (!title) return { error: 'Please enter a title.' }
+    const titleCheck = validateRequired(title, 'Please enter a title.')
+    if (!titleCheck.ok) return { error: titleCheck.error }
 
     const supabase = await createClient()
     const {
@@ -671,10 +669,9 @@ export async function shareMemory(formData: FormData) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login')
 
-    if (!title || Number.isNaN(lat) || Number.isNaN(lng)) {
+    if (!isValidMemoryInput({ title, lat, lng })) {
         redirect(`/capsules/${capsuleId}/share?error=1`)
     }
-
     const { data: capsule } = await supabase
         .from('capsules')
         .select('owner_id')

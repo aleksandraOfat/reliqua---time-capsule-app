@@ -60,12 +60,12 @@ export default async function DashboardPage({
         const openDate = getOpenDate(c)
         const openMs = openDate ? new Date(openDate).getTime() : null
 
-        let state: 'opened' | 'ready' | 'sealed' | 'collecting'
-        if (c.status === 'opened') state = 'opened'
-        else if (c.status === 'collecting') state = 'collecting'
-        else if (openMs !== null && openMs <= now) state = 'ready'
-        else state = 'sealed'
-        //const state = deriveCapsuleState({ status: c.status, openDateMs: openMs, now })
+        // let state: 'opened' | 'ready' | 'sealed' | 'collecting'
+        // if (c.status === 'opened') state = 'opened'
+        // else if (c.status === 'collecting') state = 'collecting'
+        // else if (openMs !== null && openMs <= now) state = 'ready'
+        // else state = 'sealed'
+        const state = deriveCapsuleState({ status: c.status, openDateMs: openMs, now })
 
         const daysLeft =
             openMs !== null ? Math.ceil((openMs - now) / 86_400_000) : null

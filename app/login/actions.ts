@@ -4,6 +4,7 @@ import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { validateCredentials, validatePasswordLength } from '@/lib/validation'
 
 export type AuthState = { error?: string; message?: string }
 
@@ -15,16 +16,17 @@ export async function authenticate(
     const email = (formData.get('email') as string)?.trim()
     const password = formData.get('password') as string
 
-    if (!email || !password) {
-        return { error: 'Please enter your email and password.' }
-    }
+    const credsCheck = validateCredentials(email, password)
+    if (!credsCheck.ok) return { error: credsCheck.error }
 
     const supabase = await createClient()
 
     if (intent === 'signup') {
-        if (password.length < 6) {
-            return { error: 'Password must be at least 6 characters long.' }
-        }
+        const lengthCheck = validatePasswordLength(
+            password,
+            'Password must be at least 6 characters long.'
+        )
+        if (!lengthCheck.ok) return { error: lengthCheck.error }
 
         const headerList = await headers()
         const origin = headerList.get('origin') ?? `https://${headerList.get('host') ?? ''}`

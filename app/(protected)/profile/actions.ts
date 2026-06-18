@@ -4,6 +4,13 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import crypto from 'crypto'
+import {
+    validateRequired,
+    validateUsername,
+    validateEmailChange,
+    validatePasswordLength,
+    validatePasswordsMatch,
+} from '@/lib/validation'
 
 export type ProfileState = { error?: string; success?: string }
 
@@ -13,12 +20,8 @@ export async function updateProfile(
 ): Promise<ProfileState> {
     const fullName = (formData.get('full_name') as string)?.trim()
     const username = (formData.get('username') as string)?.trim()
-    if (username && /\s/.test(username)) {
-        return { error: 'Username cannot contain spaces.' }
-    }
-    if (username && !/^[a-zA-Z0-9_-]+$/.test(username)) {
-        return { error: 'Username can only contain letters, numbers, hyphens and underscores.' }
-    }
+    const usernameCheck = validateUsername(username)
+    if (!usernameCheck.ok) return { error: usernameCheck.error }
 
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -51,17 +54,15 @@ export async function changeEmail(
 ): Promise<ProfileState> {
     const email = (formData.get('email') as string)?.trim().toLowerCase()
 
-    if (!email) {
-        return { error: 'Please enter an e-mail address.' }
-    }
+    const required = validateRequired(email, 'Please enter an e-mail address.')
+    if (!required.ok) return { error: required.error }
 
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { error: 'Not signed in.' }
 
-    if (email === (user.email ?? '').toLowerCase()) {
-        return { error: 'This is already your e-mail address.' }
-    }
+    const emailCheck = validateEmailChange(email, user.email)
+    if (!emailCheck.ok) return { error: emailCheck.error }
 
     const { error } = await supabase.auth.updateUser({ email })
     if (error) return { error: error.message }
@@ -145,12 +146,10 @@ export async function changePassword(
     const password = formData.get('password') as string
     const confirm = formData.get('confirm') as string
 
-    if (!password || password.length < 6) {
-        return { error: 'Password must be at least 6 characters.' }
-    }
-    if (password !== confirm) {
-        return { error: 'Passwords do not match.' }
-    }
+    const lengthCheck = validatePasswordLength(password)
+    if (!lengthCheck.ok) return { error: lengthCheck.error }
+    const matchCheck = validatePasswordsMatch(password, confirm)
+    if (!matchCheck.ok) return { error: matchCheck.error }
 
     const supabase = await createClient()
     const { error } = await supabase.auth.updateUser({ password })
