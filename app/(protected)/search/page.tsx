@@ -2,8 +2,9 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import {parseSearchInput} from '@/lib/tags'
+import type { Metadata } from 'next'
 
-export const metadata = { title: 'Search' }
+export const metadata: Metadata = { title: 'Search' }
 
 export default async function SearchPage({
                                              searchParams,

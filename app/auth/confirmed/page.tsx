@@ -1,9 +1,8 @@
 import Link from 'next/link'
 import Logo from '@/components/logo'
+import type { Metadata } from 'next'
 
-export const metadata = {
-    title: 'Account confirmation',
-}
+export const metadata: Metadata =  {title: 'Account confirmation',}
 
 export default async function ConfirmedPage({
                                                 searchParams,

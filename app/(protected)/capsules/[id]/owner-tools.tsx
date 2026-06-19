@@ -50,7 +50,6 @@ export default function OwnerTools({
                                 className="flex items-center justify-between rounded-lg bg-mv-sand px-3 py-2.5">
                                 <span className="mv-sans text-sm text-mv-ink">
                                     {m.email}
-                                    <span className="text-mv-muted"> · {m.member_role}</span>
                                 </span>
                                 <form action={removeMember}>
                                     <input type="hidden" name="capsule_id" value={id}/>
